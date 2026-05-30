@@ -1,0 +1,261 @@
+---
+interface Props {
+  title: string;
+  items: string[];
+}
+
+const { title, items } = Astro.props;
+---
+
+<div class="sop-checklist" data-checklist>
+  <div class="checklist-header">
+    <span class="checklist-icon">✅</span>
+    <h4 class="checklist-title">{title}</h4>
+    <span class="checklist-progress" data-progress>0/{items.length}</span>
+  </div>
+  <ul class="checklist-items">
+    {items.map((item, index) => (
+      <li class="checklist-item" data-index={index}>
+        <label class="checklist-label">
+          <input type="checkbox" class="checklist-checkbox" />
+          <span class="checklist-text">{item}</span>
+        </label>
+      </li>
+    ))}
+  </ul>
+  <div class="checklist-footer">
+    <button class="checklist-reset" data-reset>重置</button>
+    <span class="checklist-hint">点击勾选完成项</span>
+  </div>
+</div>
+
+<script>
+  // 检查清单功能
+  document.querySelectorAll('[data-checklist]').forEach(checklist => {
+    const checkboxes = checklist.querySelectorAll('.checklist-checkbox');
+    const progressEl = checklist.querySelector('[data-progress]');
+    const resetBtn = checklist.querySelector('[data-reset]');
+    const total = checkboxes.length;
+    
+    // 更新进度
+    function updateProgress() {
+      const checked = checklist.querySelectorAll('.checklist-checkbox:checked').length;
+      if (progressEl) {
+        progressEl.textContent = `${checked}/${total}`;
+      }
+      
+      // 保存到localStorage
+      const checklistId = checklist.closest('article')?.querySelector('h1, h2')?.textContent || 'default';
+      const state = Array.from(checkboxes).map(cb => cb.checked);
+      localStorage.setItem(`checklist_${checklistId}`, JSON.stringify(state));
+      
+      // 全部完成时添加动画
+      if (checked === total) {
+        checklist.classList.add('completed');
+        showConfetti(checklist);
+      } else {
+        checklist.classList.remove('completed');
+      }
+    }
+    
+    // 加载保存的状态
+    const checklistId = checklist.closest('article')?.querySelector('h1, h2')?.textContent || 'default';
+    const savedState = localStorage.getItem(`checklist_${checklistId}`);
+    if (savedState) {
+      const state = JSON.parse(savedState);
+      checkboxes.forEach((cb, i) => {
+        cb.checked = state[i] || false;
+      });
+      updateProgress();
+    }
+    
+    // 绑定事件
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', updateProgress);
+    });
+    
+    // 重置按钮
+    resetBtn?.addEventListener('click', () => {
+      checkboxes.forEach(cb => cb.checked = false);
+      updateProgress();
+    });
+  });
+  
+  // 简单的庆祝动画
+  function showConfetti(element) {
+    const rect = element.getBoundingClientRect();
+    const colors = ['#4a8a4a', '#e8b85c', '#5bbdbd', '#e85d3a'];
+    
+    for (let i = 0; i < 20; i++) {
+      const confetti = document.createElement('div');
+      confetti.style.cssText = `
+        position: fixed;
+        width: 8px;
+        height: 8px;
+        background: ${colors[Math.floor(Math.random() * colors.length)]};
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9999;
+        left: ${rect.left + rect.width / 2}px;
+        top: ${rect.top}px;
+      `;
+      document.body.appendChild(confetti);
+      
+      // 动画
+      const angle = (Math.PI * 2 * i) / 20;
+      const velocity = 100 + Math.random() * 100;
+      const vx = Math.cos(angle) * velocity;
+      const vy = Math.sin(angle) * velocity - 100;
+      
+      let x = 0, y = 0;
+      let opacity = 1;
+      
+      const animate = () => {
+        x += vx * 0.02;
+        y += vy * 0.02 + 2;
+        opacity -= 0.02;
+        
+        confetti.style.transform = `translate(${x}px, ${y}px)`;
+        confetti.style.opacity = opacity;
+        
+        if (opacity > 0) {
+          requestAnimationFrame(animate);
+        } else {
+          confetti.remove();
+        }
+      };
+      
+      requestAnimationFrame(animate);
+    }
+  }
+</script>
+
+<style>
+  .sop-checklist {
+    background: linear-gradient(135deg, var(--forest-50) 0%, var(--earth-50) 100%);
+    border: 2px solid var(--forest-200);
+    border-radius: var(--radius-xl);
+    padding: var(--space-5);
+    margin: var(--space-6) 0;
+    transition: all var(--transition-base);
+  }
+
+  .sop-checklist.completed {
+    border-color: var(--success-500);
+    background: linear-gradient(135deg, #dcfce7 0%, #f0fdf4 100%);
+  }
+
+  .checklist-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--forest-200);
+  }
+
+  .checklist-icon {
+    font-size: 1.5rem;
+  }
+
+  .checklist-title {
+    flex: 1;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--forest-800);
+    margin: 0;
+  }
+
+  .checklist-progress {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    background: var(--color-surface);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+  }
+
+  .checklist-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .checklist-item {
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+  }
+
+  .checklist-item:hover {
+    box-shadow: var(--shadow-sm);
+  }
+
+  .checklist-label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    cursor: pointer;
+  }
+
+  .checklist-checkbox {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    accent-color: var(--color-primary);
+    cursor: pointer;
+  }
+
+  .checklist-text {
+    flex: 1;
+    font-size: 0.95rem;
+    color: var(--color-text);
+    line-height: 1.5;
+    transition: all var(--transition-fast);
+  }
+
+  .checklist-checkbox:checked + .checklist-text {
+    text-decoration: line-through;
+    color: var(--color-text-muted);
+  }
+
+  .checklist-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--space-4);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--forest-200);
+  }
+
+  .checklist-reset {
+    padding: var(--space-2) var(--space-4);
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .checklist-reset:hover {
+    background: var(--stone-100);
+    color: var(--color-text);
+  }
+
+  .checklist-hint {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+  }
+
+  @media (max-width: 640px) {
+    .sop-checklist {
+      padding: var(--space-4);
+    }
+  }
+</style>

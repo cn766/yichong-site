@@ -1,0 +1,8 @@
+# robots.txt for 异宠指南
+# https://yichongzhinan.com
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://yichongzhinan.com/sitemap-index.xml

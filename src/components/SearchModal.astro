@@ -1,0 +1,504 @@
+---
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog');
+const searchData = posts.map(post => ({
+  title: post.data.title,
+  description: post.data.description,
+  slug: post.slug,
+  category: post.data.category,
+  tags: post.data.tags,
+}));
+---
+
+<div class="search-modal" id="search-modal">
+  <div class="search-overlay"></div>
+  <div class="search-container">
+    <div class="search-box">
+      <div class="search-input-wrapper">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.3-4.3"></path>
+        </svg>
+        <input 
+          type="text" 
+          id="search-input" 
+          class="search-input" 
+          placeholder="搜索文章、物种、话题..."
+          autocomplete="off"
+        />
+        <button class="search-close" id="search-close" aria-label="关闭搜索">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"></path>
+            <path d="m6 6 12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="search-shortcuts-hint">
+        <span><kbd>↑</kbd> <kbd>↓</kbd> 选择</span>
+        <span><kbd>↵</kbd> 打开</span>
+        <span><kbd>esc</kbd> 关闭</span>
+      </div>
+    </div>
+    
+    <div class="search-results" id="search-results">
+      <div class="search-empty">
+        <div class="search-empty-icon">🔍</div>
+        <p>输入关键词开始搜索</p>
+        <div class="search-suggestions">
+          <span class="suggestion-label">热门搜索：</span>
+          <button class="suggestion-tag" data-query="守宫">守宫</button>
+          <button class="suggestion-tag" data-query="玉米蛇">玉米蛇</button>
+          <button class="suggestion-tag" data-query="新手">新手</button>
+          <button class="suggestion-tag" data-query="饲养箱">饲养箱</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ searchData }}>
+  const modal = document.getElementById('search-modal');
+  const input = document.getElementById('search-input');
+  const results = document.getElementById('search-results');
+  const closeBtn = document.getElementById('search-close');
+  
+  let selectedIndex = -1;
+  let currentResults = [];
+
+  // Close modal
+  function closeModal() {
+    modal?.classList.remove('open');
+    input.value = '';
+    selectedIndex = -1;
+    showEmpty();
+  }
+
+  closeBtn?.addEventListener('click', closeModal);
+  
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal || e.target.classList.contains('search-overlay')) {
+      closeModal();
+    }
+  });
+
+  // Search function
+  function performSearch(query) {
+    if (!query.trim()) {
+      showEmpty();
+      return;
+    }
+
+    const lowerQuery = query.toLowerCase();
+    currentResults = searchData.filter(item => 
+      item.title.toLowerCase().includes(lowerQuery) ||
+      item.description.toLowerCase().includes(lowerQuery) ||
+      item.category.toLowerCase().includes(lowerQuery) ||
+      item.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
+    );
+
+    renderResults(currentResults, query);
+  }
+
+  // Highlight matching text
+  function highlightText(text, query) {
+    if (!query) return text;
+    const regex = new RegExp(`(${escapeRegex(query)})`, 'gi');
+    return text.replace(regex, '<mark>$1</mark>');
+  }
+
+  function escapeRegex(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  // Render results
+  function renderResults(items, query) {
+    selectedIndex = -1;
+    
+    if (items.length === 0) {
+      results.innerHTML = `
+        <div class="search-no-results">
+          <div class="search-empty-icon">😕</div>
+          <p>没有找到相关内容</p>
+          <p class="search-hint">试试其他关键词？</p>
+        </div>
+      `;
+      return;
+    }
+
+    const html = items.map((item, index) => `
+      <a 
+        href="/blog/${item.slug}.html" 
+        class="search-result-item ${index === 0 ? 'selected' : ''}"
+        data-index="${index}"
+      >
+        <div class="result-category">${item.category}</div>
+        <div class="result-title">${highlightText(item.title, query)}</div>
+        <div class="result-description">${highlightText(item.description, query)}</div>
+        <div class="result-tags">
+          ${item.tags.slice(0, 3).map(tag => `<span class="result-tag">${tag}</span>`).join('')}
+        </div>
+      </a>
+    `).join('');
+
+    results.innerHTML = html;
+    selectedIndex = 0;
+    updateSelection();
+
+    // Add click handlers
+    results.querySelectorAll('.search-result-item').forEach(item => {
+      item.addEventListener('click', () => {
+        closeModal();
+      });
+    });
+  }
+
+  // Show empty state
+  function showEmpty() {
+    results.innerHTML = `
+      <div class="search-empty">
+        <div class="search-empty-icon">🔍</div>
+        <p>输入关键词开始搜索</p>
+        <div class="search-suggestions">
+          <span class="suggestion-label">热门搜索：</span>
+          <button class="suggestion-tag" data-query="守宫">守宫</button>
+          <button class="suggestion-tag" data-query="玉米蛇">玉米蛇</button>
+          <button class="suggestion-tag" data-query="新手">新手</button>
+          <button class="suggestion-tag" data-query="饲养箱">饲养箱</button>
+        </div>
+      </div>
+    `;
+    
+    // Re-attach suggestion handlers
+    results.querySelectorAll('.suggestion-tag').forEach(tag => {
+      tag.addEventListener('click', () => {
+        const query = tag.dataset.query;
+        input.value = query;
+        performSearch(query);
+      });
+    });
+  }
+
+  // Update selection
+  function updateSelection() {
+    const items = results.querySelectorAll('.search-result-item');
+    items.forEach((item, index) => {
+      item.classList.toggle('selected', index === selectedIndex);
+    });
+    
+    const selected = items[selectedIndex];
+    if (selected) {
+      selected.scrollIntoView({ block: 'nearest' });
+    }
+  }
+
+  // Input handler
+  input?.addEventListener('input', (e) => {
+    performSearch(e.target.value);
+  });
+
+  // Keyboard navigation
+  input?.addEventListener('keydown', (e) => {
+    const items = results.querySelectorAll('.search-result-item');
+    
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+        updateSelection();
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        selectedIndex = Math.max(selectedIndex - 1, 0);
+        updateSelection();
+        break;
+      case 'Enter':
+        e.preventDefault();
+        const selected = items[selectedIndex];
+        if (selected) {
+          selected.click();
+        }
+        break;
+      case 'Escape':
+        e.preventDefault();
+        closeModal();
+        break;
+    }
+  });
+
+  // Initialize suggestions
+  showEmpty();
+</script>
+
+<style>
+  .search-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 10vh;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-base);
+  }
+
+  .search-modal.open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .search-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+  }
+
+  .search-container {
+    position: relative;
+    width: 90%;
+    max-width: 640px;
+    background: var(--color-surface);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+    transform: scale(0.95) translateY(-10px);
+    transition: transform var(--transition-base);
+  }
+
+  .search-modal.open .search-container {
+    transform: scale(1) translateY(0);
+  }
+
+  .search-box {
+    padding: var(--space-5);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  .search-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: var(--stone-50);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-fast);
+  }
+
+  .search-input-wrapper:focus-within {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 4px rgba(74, 138, 74, 0.1);
+  }
+
+  .search-icon {
+    color: var(--color-text-muted);
+    flex-shrink: 0;
+  }
+
+  .search-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 0;
+    font-size: 1.1rem;
+    color: var(--color-text);
+  }
+
+  .search-input:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  .search-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: var(--stone-200);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .search-close:hover {
+    background: var(--stone-300);
+    color: var(--color-text);
+  }
+
+  .search-shortcuts-hint {
+    display: flex;
+    gap: var(--space-4);
+    margin-top: var(--space-3);
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+  }
+
+  .search-shortcuts-hint kbd {
+    display: inline-block;
+    padding: 0.1rem 0.4rem;
+    background: var(--stone-100);
+    border: 1px solid var(--stone-200);
+    border-radius: var(--radius-sm);
+    font-family: monospace;
+    font-size: 0.75rem;
+  }
+
+  .search-results {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .search-empty,
+  .search-no-results {
+    padding: var(--space-10) var(--space-6);
+    text-align: center;
+  }
+
+  .search-empty-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-4);
+    opacity: 0.6;
+  }
+
+  .search-empty p,
+  .search-no-results p {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-4);
+  }
+
+  .search-hint {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+  }
+
+  .search-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+  }
+
+  .suggestion-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+
+  .suggestion-tag {
+    padding: var(--space-1) var(--space-3);
+    background: var(--forest-50);
+    border: 1px solid var(--forest-200);
+    border-radius: var(--radius-full);
+    font-size: 0.85rem;
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .suggestion-tag:hover {
+    background: var(--forest-100);
+    border-color: var(--color-primary);
+  }
+
+  .search-result-item {
+    display: block;
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--color-border-light);
+    transition: all var(--transition-fast);
+    text-decoration: none;
+  }
+
+  .search-result-item:hover,
+  .search-result-item.selected {
+    background: var(--forest-50);
+  }
+
+  .search-result-item.selected {
+    border-left: 3px solid var(--color-primary);
+    padding-left: calc(var(--space-5) - 3px);
+  }
+
+  .result-category {
+    font-size: 0.75rem;
+    color: var(--color-primary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-1);
+  }
+
+  .result-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--space-1);
+  }
+
+  .result-title mark {
+    background: var(--color-accent-light);
+    color: var(--stone-900);
+    padding: 0 0.1rem;
+    border-radius: 2px;
+  }
+
+  .result-description {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+    margin-bottom: var(--space-2);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .result-description mark {
+    background: var(--color-accent-light);
+    color: var(--stone-900);
+    padding: 0 0.1rem;
+    border-radius: 2px;
+  }
+
+  .result-tags {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  .result-tag {
+    font-size: 0.75rem;
+    padding: 0.15rem 0.5rem;
+    background: var(--stone-100);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+  }
+
+  @media (max-width: 640px) {
+    .search-modal {
+      padding-top: 0;
+      align-items: flex-end;
+    }
+
+    .search-container {
+      width: 100%;
+      max-height: 80vh;
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    }
+
+    .search-shortcuts-hint {
+      display: none;
+    }
+
+    .search-results {
+      max-height: 50vh;
+    }
+  }
+</style>

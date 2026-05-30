@@ -1,0 +1,925 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog');
+posts.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+const latestPosts = posts.slice(0, 6);
+const featuredPost = posts[0];
+
+// 统计数据
+const totalPosts = posts.length;
+const totalCategories = [...new Set(posts.map(p => p.data.category))].length;
+const totalTags = [...new Set(posts.flatMap(p => p.data.tags))].length;
+
+// 分类数据
+const categories = [
+  { name: '新手指南', icon: '🌱', desc: '从零开始的完整饲养教程', count: posts.filter(p => p.data.category === '新手指南').length },
+  { name: '装备选购', icon: '🛠️', desc: '饲养箱、加热、照明设备横评', count: posts.filter(p => p.data.category === '装备选购').length },
+  { name: '技术教程', icon: '🔬', desc: '温控、湿度、环境搭建', count: posts.filter(p => p.data.category === '技术教程').length },
+  { name: '疾病处理', icon: '🏥', desc: '症状识别与处理方法', count: posts.filter(p => p.data.category === '疾病处理').length },
+];
+
+// 推荐物种
+const featuredSpecies = [
+  { name: '豹纹守宫', emoji: '🦎', tag: '新手首选', color: '#F5A623' },
+  { name: '玉米蛇', emoji: '🐍', tag: '温顺无毒', color: '#E85D3A' },
+  { name: '角蛙', emoji: '🐸', tag: '超省心', color: '#9ACD32' },
+  { name: '鬃狮蜥', emoji: '🦖', tag: '互动性强', color: '#D2691E' },
+];
+---
+
+<Layout title="异宠指南 - 科学饲养从这里开始" description="中国第一个异宠新手系统化饲养指南——守宫、玉米蛇、鬃狮蜥、角蛙全面饲养知识。从零开始，科学饲养。">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-bg">
+      <div class="hero-leaf leaf-1">🌿</div>
+      <div class="hero-leaf leaf-2">🍃</div>
+      <div class="hero-leaf leaf-3">🌱</div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-icon">🌿</span>
+        <span>新手饲养指南</span>
+      </div>
+      <h1 class="hero-title">
+        从零开始<br/>
+        <span class="text-gradient">科学养异宠</span>
+      </h1>
+      <p class="hero-subtitle">
+        守宫、玉米蛇、鬃狮蜥、角蛙——每个品种都有完整的饲养框架。<br/>
+        不再依赖碎片化的贴吧信息，这里有你需要的全部。
+      </p>
+      <div class="hero-actions">
+        <a href="/species.html" class="btn btn-primary btn-lg">
+          <span>探索物种</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+        <a href="/blog.html" class="btn btn-secondary btn-lg">
+          <span>浏览文章</span>
+        </a>
+      </div>
+      
+      <!-- Stats -->
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-number">{totalPosts}+</span>
+          <span class="stat-label">专业文章</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">15+</span>
+          <span class="stat-label">物种详解</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">{totalCategories}</span>
+          <span class="stat-label">分类主题</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Species -->
+  <section class="section featured-species">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">热门推荐</span>
+        <h2 class="section-title">新手友好物种</h2>
+        <p class="section-desc">从这些温顺好养的品种开始你的异宠之旅</p>
+      </div>
+      
+      <div class="species-grid">
+        {featuredSpecies.map((species, index) => (
+          <a href="/species.html" class="species-card" style={`--card-color: ${species.color}`}>
+            <div class="species-emoji">{species.emoji}</div>
+            <div class="species-info">
+              <span class="species-tag">{species.tag}</span>
+              <h3>{species.name}</h3>
+            </div>
+            <div class="species-arrow">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories -->
+  <section class="section categories-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">知识库</span>
+        <h2 class="section-title">按主题浏览</h2>
+        <p class="section-desc">找到你需要的饲养知识</p>
+      </div>
+      
+      <div class="categories-grid">
+        {categories.map(cat => (
+          <a href={`/blog.html?category=${encodeURIComponent(cat.name)}`} class="category-card">
+            <div class="category-icon-wrapper">
+              <span class="category-icon">{cat.icon}</span>
+            </div>
+            <div class="category-content">
+              <h3>{cat.name}</h3>
+              <p>{cat.desc}</p>
+              <span class="category-count">{cat.count} 篇文章</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Article -->
+  {featuredPost && (
+    <section class="section featured-article">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-eyebrow">精选内容</span>
+          <h2 class="section-title">最新深度文章</h2>
+        </div>
+        
+        <article class="featured-card">
+          <div class="featured-image">
+            {featuredPost.data.heroImage && (
+              <img src={featuredPost.data.heroImage} alt={featuredPost.data.title} loading="lazy" />
+            )}
+            <div class="featured-image-overlay"></div>
+          </div>
+          <div class="featured-content">
+            <div class="featured-meta">
+              <span class="featured-category">{featuredPost.data.category}</span>
+              <time datetime={featuredPost.data.pubDate.toISOString()}>
+                {featuredPost.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}
+              </time>
+            </div>
+            <h3 class="featured-title">
+              <a href={`/blog/${featuredPost.slug}.html`}>{featuredPost.data.title}</a>
+            </h3>
+            <p class="featured-desc">{featuredPost.data.description}</p>
+            <div class="featured-tags">
+              {featuredPost.data.tags.slice(0, 4).map(tag => (
+                <span class="featured-tag">{tag}</span>
+              ))}
+            </div>
+            <a href={`/blog/${featuredPost.slug}.html`} class="featured-link">
+              阅读全文
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+          </div>
+        </article>
+      </div>
+    </section>
+  )}
+
+  <!-- Latest Articles -->
+  <section class="section latest-articles">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">持续更新</span>
+        <h2 class="section-title">最新文章</h2>
+        <p class="section-desc">收藏不迷路，持续学习成长</p>
+      </div>
+      
+      <div class="articles-grid">
+        {latestPosts.slice(1).map((post, index) => (
+          <article class="article-card" style={`animation-delay: ${index * 100}ms`}>
+            {post.data.heroImage && (
+              <a href={`/blog/${post.slug}.html`} class="article-image">
+                <img src={post.data.heroImage} alt={post.data.title} loading="lazy" />
+              </a>
+            )}
+            <div class="article-content">
+              <div class="article-meta">
+                <span class="article-category">{post.data.category}</span>
+                <time datetime={post.data.pubDate.toISOString()}>
+                  {post.data.pubDate.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })}
+                </time>
+              </div>
+              <h3 class="article-title">
+                <a href={`/blog/${post.slug}.html`}>{post.data.title}</a>
+              </h3>
+              <p class="article-desc">{post.data.description}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+      
+      <div class="section-cta">
+        <a href="/blog.html" class="btn btn-outline">
+          查看全部文章
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="section cta-section">
+    <div class="container">
+      <div class="cta-card">
+        <div class="cta-content">
+          <h2>准备好开始了吗？</h2>
+          <p>从物种大全中找到适合你的第一只异宠，开启科学饲养之旅。</p>
+          <a href="/species.html" class="btn btn-accent btn-lg">
+            探索所有物种
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+        </div>
+        <div class="cta-decoration">
+          <span class="cta-emoji">🦎</span>
+          <span class="cta-emoji">🐍</span>
+          <span class="cta-emoji">🐸</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  /* Hero Section */
+  .hero {
+    position: relative;
+    min-height: calc(100vh - var(--header-height));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-12) var(--space-5);
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--forest-50) 0%, var(--earth-50) 50%, var(--forest-100) 100%);
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .hero-leaf {
+    position: absolute;
+    font-size: 8rem;
+    opacity: 0.08;
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .leaf-1 { top: 10%; left: 5%; animation-delay: 0s; }
+  .leaf-2 { top: 60%; right: 10%; animation-delay: 2s; font-size: 6rem; }
+  .leaf-3 { bottom: 20%; left: 15%; animation-delay: 4s; font-size: 5rem; }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(5deg); }
+  }
+
+  .hero-content {
+    position: relative;
+    text-align: center;
+    max-width: 720px;
+    animation: fadeInUp 0.8s ease-out;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid var(--forest-200);
+    border-radius: var(--radius-full);
+    font-size: 0.9rem;
+    color: var(--forest-700);
+    font-weight: 500;
+    margin-bottom: var(--space-6);
+    backdrop-filter: blur(8px);
+  }
+
+  .badge-icon {
+    font-size: 1.1rem;
+  }
+
+  .hero-title {
+    font-size: clamp(2.5rem, 8vw, 4rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: var(--space-6);
+    color: var(--forest-900);
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, var(--forest-600) 0%, var(--color-accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-subtitle {
+    font-size: 1.15rem;
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin-bottom: var(--space-8);
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: var(--space-4);
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: var(--space-12);
+  }
+
+  .btn-lg {
+    padding: var(--space-4) var(--space-8);
+    font-size: 1.05rem;
+  }
+
+  .btn-lg svg {
+    transition: transform 0.2s;
+  }
+
+  .btn-lg:hover svg {
+    transform: translateX(4px);
+  }
+
+  .hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-10);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--forest-200);
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--forest-700);
+    font-family: var(--font-display);
+  }
+
+  .stat-label {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+  }
+
+  /* Section Styles */
+  .section {
+    padding: var(--space-20) 0;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: var(--space-12);
+  }
+
+  .section-eyebrow {
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: var(--space-3);
+  }
+
+  .section-title {
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    font-weight: 700;
+    margin-bottom: var(--space-3);
+    color: var(--forest-900);
+  }
+
+  .section-desc {
+    font-size: 1.1rem;
+    color: var(--color-text-secondary);
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .section-cta {
+    text-align: center;
+    margin-top: var(--space-10);
+  }
+
+  /* Featured Species */
+  .featured-species {
+    background: var(--color-surface);
+  }
+
+  .species-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-5);
+  }
+
+  .species-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-6);
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    text-align: center;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .species-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--card-color) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+  }
+
+  .species-card:hover {
+    border-color: var(--card-color);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  }
+
+  .species-card:hover::before {
+    opacity: 0.08;
+  }
+
+  .species-emoji {
+    font-size: 3.5rem;
+    margin-bottom: var(--space-4);
+    position: relative;
+    z-index: 1;
+  }
+
+  .species-info {
+    position: relative;
+    z-index: 1;
+  }
+
+  .species-tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: var(--space-1) var(--space-3);
+    background: var(--forest-100);
+    color: var(--forest-700);
+    border-radius: var(--radius-full);
+    font-weight: 500;
+    margin-bottom: var(--space-2);
+  }
+
+  .species-info h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .species-arrow {
+    position: absolute;
+    bottom: var(--space-4);
+    right: var(--space-4);
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all var(--transition-fast);
+    color: var(--card-color);
+  }
+
+  .species-card:hover .species-arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* Categories */
+  .categories-section {
+    background: linear-gradient(180deg, var(--forest-50) 0%, var(--color-bg) 100%);
+  }
+
+  .categories-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-5);
+  }
+
+  .category-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-8) var(--space-6);
+    background: var(--color-surface);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border);
+    text-align: center;
+    transition: all var(--transition-base);
+  }
+
+  .category-card:hover {
+    border-color: var(--forest-300);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+  }
+
+  .category-icon-wrapper {
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--forest-100) 0%, var(--forest-50) 100%);
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--space-5);
+  }
+
+  .category-icon {
+    font-size: 2rem;
+  }
+
+  .category-content h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+    color: var(--color-text);
+  }
+
+  .category-content p {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-3);
+    line-height: 1.6;
+  }
+
+  .category-count {
+    font-size: 0.8rem;
+    color: var(--color-primary);
+    font-weight: 500;
+  }
+
+  /* Featured Article */
+  .featured-article {
+    background: var(--color-surface);
+  }
+
+  .featured-card {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 0;
+    background: var(--color-surface);
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .featured-image {
+    position: relative;
+    min-height: 400px;
+  }
+
+  .featured-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .featured-image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(58, 111, 58, 0.1) 0%, transparent 100%);
+  }
+
+  .featured-content {
+    padding: var(--space-10);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .featured-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
+  }
+
+  .featured-category {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: var(--space-1) var(--space-3);
+    background: var(--forest-50);
+    border-radius: var(--radius-full);
+  }
+
+  .featured-meta time {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+  }
+
+  .featured-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: var(--space-4);
+    line-height: 1.3;
+  }
+
+  .featured-title a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .featured-title a:hover {
+    color: var(--color-primary);
+  }
+
+  .featured-desc {
+    font-size: 1.05rem;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin-bottom: var(--space-5);
+  }
+
+  .featured-tags {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-6);
+  }
+
+  .featured-tag {
+    font-size: 0.8rem;
+    padding: var(--space-1) var(--space-3);
+    background: var(--stone-100);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .featured-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
+  .featured-link svg {
+    transition: transform 0.2s;
+  }
+
+  .featured-link:hover svg {
+    transform: translateX(4px);
+  }
+
+  /* Latest Articles */
+  .latest-articles {
+    background: linear-gradient(180deg, var(--color-bg) 0%, var(--forest-50) 100%);
+  }
+
+  .articles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+  }
+
+  .article-card {
+    background: var(--color-surface);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    transition: all var(--transition-base);
+    animation: fadeInUp 0.6s ease-out backwards;
+  }
+
+  .article-card:hover {
+    border-color: var(--forest-300);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+  }
+
+  .article-image {
+    display: block;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+  }
+
+  .article-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s;
+  }
+
+  .article-card:hover .article-image img {
+    transform: scale(1.05);
+  }
+
+  .article-content {
+    padding: var(--space-5);
+  }
+
+  .article-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-3);
+  }
+
+  .article-category {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .article-meta time {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+  }
+
+  .article-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+    line-height: 1.4;
+  }
+
+  .article-title a {
+    color: var(--color-text);
+  }
+
+  .article-title a:hover {
+    color: var(--color-primary);
+  }
+
+  .article-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* CTA Section */
+  .cta-section {
+    padding-bottom: var(--space-24);
+  }
+
+  .cta-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-10) var(--space-12);
+    background: linear-gradient(135deg, var(--forest-600) 0%, var(--forest-800) 100%);
+    border-radius: var(--radius-2xl);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .cta-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta-content h2 {
+    font-size: 2rem;
+    color: white;
+    margin-bottom: var(--space-3);
+    margin-top: 0;
+  }
+
+  .cta-content p {
+    font-size: 1.1rem;
+    color: var(--forest-200);
+    margin-bottom: var(--space-6);
+  }
+
+  .cta-decoration {
+    display: flex;
+    gap: var(--space-4);
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta-emoji {
+    font-size: 4rem;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .cta-emoji:nth-child(2) { animation-delay: 0.5s; }
+  .cta-emoji:nth-child(3) { animation-delay: 1s; }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .species-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .categories-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .featured-card {
+      grid-template-columns: 1fr;
+    }
+
+    .featured-image {
+      min-height: 250px;
+    }
+
+    .articles-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      min-height: auto;
+      padding: var(--space-10) var(--space-4);
+    }
+
+    .hero-title {
+      font-size: 2rem;
+    }
+
+    .hero-stats {
+      gap: var(--space-6);
+    }
+
+    .stat-number {
+      font-size: 1.5rem;
+    }
+
+    .species-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .categories-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .articles-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .cta-card {
+      flex-direction: column;
+      text-align: center;
+      padding: var(--space-8) var(--space-5);
+    }
+
+    .cta-decoration {
+      margin-top: var(--space-6);
+    }
+
+    .cta-emoji {
+      font-size: 3rem;
+    }
+
+    .section {
+      padding: var(--space-12) 0;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero-actions {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .hero-actions .btn {
+      width: 100%;
+    }
+
+    .featured-content {
+      padding: var(--space-6);
+    }
+
+    .featured-title {
+      font-size: 1.35rem;
+    }
+  }
+</style>

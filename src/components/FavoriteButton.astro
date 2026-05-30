@@ -1,0 +1,164 @@
+---
+interface Props {
+  postSlug: string;
+  postTitle: string;
+}
+
+const { postSlug, postTitle } = Astro.props;
+---
+
+<button class="favorite-btn" id="favorite-btn" data-slug={postSlug} data-title={postTitle} aria-label="收藏文章">
+  <svg class="heart-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+  </svg>
+  <span class="favorite-text">收藏</span>
+</button>
+
+<script define:vars={{ postSlug, postTitle }}>
+  const STORAGE_KEY = 'favorites';
+  
+  // 获取收藏列表
+  function getFavorites() {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  }
+  
+  // 检查是否已收藏
+  function isFavorited(slug) {
+    const favorites = getFavorites();
+    return favorites.some(f => f.slug === slug);
+  }
+  
+  // 添加收藏
+  function addFavorite(slug, title) {
+    const favorites = getFavorites();
+    if (!favorites.some(f => f.slug === slug)) {
+      favorites.unshift({
+        slug,
+        title,
+        date: new Date().toISOString()
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(favorites));
+    }
+  }
+  
+  // 移除收藏
+  function removeFavorite(slug) {
+    const favorites = getFavorites();
+    const filtered = favorites.filter(f => f.slug !== slug);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+  }
+  
+  // 更新按钮状态
+  function updateButtonState() {
+    const btn = document.getElementById('favorite-btn');
+    const isFav = isFavorited(postSlug);
+    
+    if (isFav) {
+      btn.classList.add('favorited');
+      btn.querySelector('.favorite-text').textContent = '已收藏';
+    } else {
+      btn.classList.remove('favorited');
+      btn.querySelector('.favorite-text').textContent = '收藏';
+    }
+  }
+  
+  // 绑定点击事件
+  const btn = document.getElementById('favorite-btn');
+  btn?.addEventListener('click', () => {
+    if (isFavorited(postSlug)) {
+      removeFavorite(postSlug);
+      showToast('已取消收藏');
+    } else {
+      addFavorite(postSlug, postTitle);
+      showToast('收藏成功！');
+    }
+    updateButtonState();
+  });
+  
+  // Toast提示
+  function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 2000);
+  }
+  
+  // 初始化
+  updateButtonState();
+</script>
+
+<style>
+  .favorite-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    background: var(--color-surface);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .favorite-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: var(--forest-50);
+  }
+
+  .favorite-btn.favorited {
+    background: var(--forest-100);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  .favorite-btn.favorited .heart-icon {
+    fill: currentColor;
+  }
+
+  .heart-icon {
+    transition: transform var(--transition-fast);
+  }
+
+  .favorite-btn:hover .heart-icon {
+    transform: scale(1.1);
+  }
+
+  .favorite-btn.favorited .heart-icon {
+    animation: heartBeat 0.3s ease;
+  }
+
+  @keyframes heartBeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+  }
+
+  :global(.toast) {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--forest-800);
+    color: white;
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--radius-full);
+    font-size: 0.95rem;
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+
+  :global(.toast.show) {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+</style>

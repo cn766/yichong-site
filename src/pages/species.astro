@@ -1,0 +1,1063 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SpeciesChart from '../components/SpeciesChart.astro';
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('blog');
+
+// 完整物种数据库
+const speciesGroups = [
+  {
+    name: '守宫类',
+    emoji: '🦎',
+    icon: 'gecko',
+    intro: '爬宠界的新手首选。体型小巧、性格温和、寿命10-20年，适合桌面和卧室饲养。品种品系极其丰富，是变色和基因的视觉盛宴。',
+    color: '#4A8A4A',
+    species: [
+      {
+        name: '豹纹守宫', latin: 'Eublepharis macularius',
+        size: '18-25cm', lifespan: '10-20年',
+        temp: '28-32°C（热点）/ 22-26°C（冷区）', humidity: '30-40%',
+        enclosure: '60×30×30cm（成体）', diet: '蟋蟀、蟑螂、面包虫',
+        temperament: '极度温和，可上手，几乎不咬人', beginner: true,
+        difficulty: '⭐', morphs: '200+ 品系',
+        desc: '豹纹守宫是全世界最受欢迎的宠物守宫。性格温顺到可以闭眼在手上睡觉，品系从几十元的普通高黄到上万的黑夜一应俱全。夜行性，不需要UVB灯（但可以给），是最省心的入门异宠。',
+        filterTag: '豹纹守宫',
+        cardColor: '#F5A623'
+      },
+      {
+        name: '睫角守宫', latin: 'Correlophus ciliatus',
+        size: '18-23cm', lifespan: '15-20年',
+        temp: '22-26°C（怕热！28°C以上危险）', humidity: '60-80%',
+        enclosure: '45×45×60cm（高缸，树栖）', diet: '果泥为主，辅以昆虫',
+        temperament: '温顺，跳跃力强需注意', beginner: true,
+        difficulty: '⭐', morphs: '50+ 品系',
+        desc: '睫角守宫最大的优势：不需要活虫饲料！吃专用果泥即可，特别适合不喜欢养虫子的饲养者。但要注意它是树栖的，需要高缸，且怕热——夏天超过28°C就需要降温措施。',
+        filterTag: '睫角守宫',
+        cardColor: '#E8734A'
+      },
+      {
+        name: '肥尾守宫', latin: 'Hemitheconyx caudicinctus',
+        size: '20-28cm', lifespan: '15-20年',
+        temp: '28-30°C（热点）/ 24-26°C（冷区）', humidity: '50-70%',
+        enclosure: '60×30×30cm（成体）', diet: '蟋蟀、蟑螂',
+        temperament: '非常温和，比豹纹更"佛系"', beginner: true,
+        difficulty: '⭐', morphs: '30+ 品系',
+        desc: '肥尾守宫比豹纹守宫更敦实、更佛系。但需要注意——它的湿度要求比豹纹高（50-70%），需要定期喷水。很多人以为和豹纹一样养，结果出现蜕皮困难问题。',
+        filterTag: '肥尾守宫',
+        cardColor: '#7C5C3C'
+      },
+      {
+        name: '巨人守宫', latin: 'Rhacodactylus leachianus',
+        size: '30-40cm', lifespan: '20-30年',
+        temp: '22-26°C', humidity: '60-80%',
+        enclosure: '60×45×90cm（成体高缸）', diet: '果泥+昆虫',
+        temperament: '略显神经质，个体差异大', beginner: false,
+        difficulty: '⭐⭐⭐', morphs: '地域型为主',
+        desc: '世界上最大的守宫，体型是普通守宫的3-5倍。价格昂贵（5000-20000+），领地意识强不宜群养，而且叫声非常响亮（在夜里尤其）。适合有经验的玩家进阶。',
+        filterTag: '巨人守宫',
+        cardColor: '#4A6741'
+      },
+      {
+        name: '瘤尾守宫', latin: 'Nephrurus spp.',
+        size: '10-14cm', lifespan: '8-12年',
+        temp: '30-34°C（热点，需高温！）/ 24-26°C', humidity: '40-50%',
+        enclosure: '30×20×15cm（小而精致）', diet: '蟋蟀',
+        temperament: '胆小但可爱，尾端球形是萌点', beginner: false,
+        difficulty: '⭐⭐', morphs: '品系较少',
+        desc: '瘤尾守宫以尾端小球状的"瘤"闻名，是守宫界的萌值担当。但饲养有门槛：需要比豹纹更高的温度（热点34°C），且体型小、速度快，不适合频繁上手把玩。',
+        filterTag: '瘤尾守宫',
+        cardColor: '#D4A574'
+      },
+    ]
+  },
+  {
+    name: '蛇类',
+    emoji: '🐍',
+    icon: 'snake',
+    intro: '宠物蛇是世界上最安全的蛇类——温顺无毒，不需要每天喂食，甚至可以一周见一次面。但需要能接受喂食冷冻小鼠。',
+    color: '#E85D3A',
+    species: [
+      {
+        name: '玉米蛇', latin: 'Pantherophis guttatus',
+        size: '90-150cm', lifespan: '15-20年',
+        temp: '28-30°C（热点）/ 24-26°C（冷区）', humidity: '40-60%',
+        enclosure: '90×45×45cm（成体）', diet: '冷冻小鼠（7-14天一次）',
+        temperament: '性格极好，温顺不上手都有点可惜', beginner: true,
+        difficulty: '⭐', morphs: '800+ 品系',
+        desc: '全世界最受欢迎的宠物蛇，没有之一。无毒、不攻击人（除非你闻起来像老鼠）、品系多达800+种，颜色从血红到雪白一应俱全。唯一需要适应的：喂食冷冻小鼠。',
+        filterTag: '玉米蛇',
+        cardColor: '#E85D3A'
+      },
+      {
+        name: '球蟒', latin: 'Python regius',
+        size: '90-150cm', lifespan: '20-30年',
+        temp: '31-33°C（热点）/ 26-28°C（冷区）', humidity: '50-60%',
+        enclosure: '120×60×45cm（成体）', diet: '冷冻大鼠（7-14天一次）',
+        temperament: '极度温顺，受惊时蜷成球状', beginner: true,
+        difficulty: '⭐⭐', morphs: '5000+ 品系',
+        desc: '球蟒是宠物蛇界的"贵妇犬"——温顺到令人发指，受惊时不是攻击而是团成一个球。品系极其丰富，从几百到几十万都有。但注意：有些个体有季节性拒食行为，新手可能被吓到。',
+        filterTag: '球蟒',
+        cardColor: '#B8860B'
+      },
+      {
+        name: '王蛇', latin: 'Lampropeltis getula',
+        size: '90-180cm', lifespan: '15-25年',
+        temp: '26-30°C（热点）/ 22-26°C（冷区）', humidity: '40-50%',
+        enclosure: '90×45×30cm（成体）', diet: '冷冻小鼠（7-10天一次）',
+        temperament: '食欲极旺盛，喂食时需谨慎', beginner: false,
+        difficulty: '⭐⭐', morphs: '50+ 品系',
+        desc: '王蛇名字里的"王"名副其实——它在野外会吃其他蛇类（包括毒蛇）。食欲极其旺盛，几乎从不拒食，但这也意味着喂食反应非常强烈，不建议新手作为第一条蛇。',
+        filterTag: '王蛇',
+        cardColor: '#FF6347'
+      },
+      {
+        name: '加州王蛇', latin: 'Lampropeltis californiae',
+        size: '90-120cm', lifespan: '15-20年',
+        temp: '26-30°C（热点）/ 22-26°C（冷区）', humidity: '40-50%',
+        enclosure: '90×45×30cm（成体）', diet: '冷冻小鼠/乳鼠（7-10天一次）',
+        temperament: '温顺好奇，对人类友好', beginner: true,
+        difficulty: '⭐', morphs: '60+ 品系',
+        desc: '加州王蛇是王蛇中最受欢迎的亚种之一。最大的特点是对蛇毒免疫——在野外会捕食响尾蛇等毒蛇。性格温顺好奇，非常适合新手入门。品系丰富，从经典黑白环纹到各种选育色型都有。',
+        filterTag: '加州王蛇',
+        cardColor: '#FF8C00'
+      },
+      {
+        name: '猪鼻蛇', latin: 'Heterodon nasicus',
+        size: '45-60cm', lifespan: '12-18年',
+        temp: '26-30°C（热点）/ 22-26°C（冷区）', humidity: '40-60%',
+        enclosure: '60×30×30cm（成体）', diet: '冷冻小鼠（5-7天一次）',
+        temperament: '温和可爱，受惊时翻肚皮装死', beginner: true,
+        difficulty: '⭐', morphs: '30+ 品系',
+        desc: '猪鼻蛇因上翘的吻部得名，是蛇界的小丑——受惊时会翻肚皮张嘴装死，演技堪比奥斯卡。体型小巧（不超过60cm），性格温和，几乎不咬人。微毒（对人类无害），是新手入门的绝佳选择。',
+        filterTag: '猪鼻蛇',
+        cardColor: '#DEB887'
+      },
+    ]
+  },
+  {
+    name: '蜥蜴类',
+    emoji: '🦖',
+    icon: 'lizard',
+    intro: '日行性蜥蜴互动性极强——它们看着你、回应你、甚至会认人。但代价是：需要UVB灯、精确温控和更大的空间。',
+    color: '#D2691E',
+    species: [
+      {
+        name: '鬃狮蜥', latin: 'Pogona vitticeps',
+        size: '45-60cm', lifespan: '8-12年',
+        temp: '38-42°C（晒点！）/ 28-32°C（热区）/ 24-26°C（冷区）', humidity: '30-40%',
+        enclosure: '120×60×60cm（成体）', diet: '昆虫（幼体70%）+ 蔬菜（成体70%）',
+        temperament: '"蜥蜴界的金毛"，会认人，有肢体语言', beginner: true,
+        difficulty: '⭐⭐', morphs: '20+ 品系',
+        desc: '鬃狮蜥是互动性最强的宠物蜥蜴。它们会向你挥手（其实是示弱信号）、会歪头看你、会趴在肩膀上晒太阳。但饲养细节较多：必须有UVB灯、需要大空间、幼体和成体食谱不同。',
+        filterTag: '鬃狮蜥',
+        cardColor: '#D2691E'
+      },
+      {
+        name: '蓝舌石龙子', latin: 'Tiliqua scincoides',
+        size: '45-60cm', lifespan: '15-20年',
+        temp: '32-35°C（热点）/ 24-28°C（冷区）', humidity: '30-50%',
+        enclosure: '120×60×30cm（成体，地面活动为主）', diet: '杂食（优质狗粮+蔬果+昆虫）',
+        temperament: '温顺且贪吃，舌头是蓝色的！', beginner: true,
+        difficulty: '⭐⭐', morphs: '地域型为主',
+        desc: '蓝舌石龙子的蓝色舌头是它的招牌，吐舌时非常可爱。最大优点：食性包容——优质猫狗粮+蔬菜水果+昆虫都能吃，不需要纯活食。缺点是体型粗壮，需要较大地面空间。',
+        filterTag: '蓝舌石龙子',
+        cardColor: '#4169E1'
+      },
+      {
+        name: '绿鬣蜥', latin: 'Iguana iguana',
+        size: '120-180cm（含尾巴）', lifespan: '15-20年',
+        temp: '32-38°C（晒点）/ 26-30°C（环境）', humidity: '65-80%',
+        enclosure: '180×120×180cm（成体！需要一间房）', diet: '纯素食（绿叶蔬菜为主）',
+        temperament: '成体有领地意识，驯化需耐心', beginner: false,
+        difficulty: '⭐⭐⭐', morphs: '红、蓝、绿等色型',
+        desc: '绿鬣蜥长大后需要一个房间大小的空间——不是开玩笑。成体可达1.8米，有领地意识，尾巴抽人能造成淤青。纯素食是优势，但绝不适合新手和空间有限的家庭饲养。',
+        filterTag: '绿鬣蜥',
+        cardColor: '#228B22'
+      },
+      {
+        name: '高冠变色龙', latin: 'Chamaeleo calyptratus',
+        size: '35-60cm', lifespan: '5-8年',
+        temp: '22-28°C（环境）/ 28-35°C（晒点）', humidity: '50-70%',
+        enclosure: '60×60×90cm（成体高缸，必须网箱或通风良好）', diet: '蟋蟀、蟑螂、面包虫（需活食）',
+        temperament: '敏感易应激，不宜频繁上手', beginner: false,
+        difficulty: '⭐⭐⭐', morphs: '地域型+选育色型',
+        desc: '高冠变色龙以头顶高耸的"冠"和出色的变色能力闻名。它们是爬宠界最敏感的物种之一——看到自己的倒影都可能应激。需要网箱饲养（不能玻璃缸）、活食投喂、滴水饮水（不会用饮水器）。适合有经验的玩家。',
+        filterTag: '高冠变色龙',
+        cardColor: '#2E8B57'
+      },
+    ]
+  },
+  {
+    name: '蛙类',
+    emoji: '🐸',
+    icon: 'frog',
+    intro: '两栖类是最容易被"好心养死"的类别，因为它们的皮肤会吸收环境中的一切——包括你手上的化学物质。',
+    color: '#9ACD32',
+    species: [
+      {
+        name: '角蛙', latin: 'Ceratophrys spp.',
+        size: '10-15cm', lifespan: '6-10年',
+        temp: '24-28°C', humidity: '70-80%',
+        enclosure: '30×20×15cm（小而精）', diet: '蟋蟀、蟑螂、小鱼、乳鼠',
+        temperament: '坐着不动，会咬任何移动的东西', beginner: true,
+        difficulty: '⭐', morphs: '钟角蛙/南美角蛙/霸王角蛙等',
+        desc: '角蛙是最省心的异宠之一，也是"异宠入门双雄"的另一个位。它们几乎完全不动，不需要互动也不需要遛。但最容易被新手搞砸的两点：1）湿度不够导致夏眠假死，2）用手直接触摸导致皮肤中毒。',
+        filterTag: '角蛙',
+        cardColor: '#9ACD32'
+      },
+      {
+        name: '老爷树蛙', latin: 'Litoria caerulea',
+        size: '7-11cm', lifespan: '10-16年',
+        temp: '24-28°C', humidity: '50-70%',
+        enclosure: '45×45×60cm（高缸，树栖）', diet: '蟋蟀、蟑螂、飞蛾',
+        temperament: '温顺圆胖，表情天然呆', beginner: true,
+        difficulty: '⭐⭐', morphs: '绿色/蓝色色型',
+        desc: '老爷树蛙，也叫"白氏树蛙"，以圆滚滚的体态和呆萌的表情出圈。它是树蛙中最好养的品种之一。注意：需要高缸和攀爬枝条，手指触摸前必须洗手——蛙类皮肤极其敏感。',
+        filterTag: '老爷树蛙',
+        cardColor: '#3CB371'
+      },
+      {
+        name: '番茄蛙', latin: 'Dyscophus antongilii',
+        size: '6-10cm', lifespan: '6-8年',
+        temp: '22-26°C', humidity: '70-85%',
+        enclosure: '45×30×30cm（地面为主）', diet: '蟋蟀、蟑螂',
+        temperament: '胆小，受惊时鼓起身体', beginner: false,
+        difficulty: '⭐⭐', morphs: '单一色型',
+        desc: '番茄蛙因鲜红色外观得名，受惊时会鼓起身体让自己变大。虽然上镜好看，但饲养不简单——需要很高湿度（70-85%）且不能上手（皮肤分泌的粘液有刺激性）。适合颜值党进阶。',
+        filterTag: '番茄蛙',
+        cardColor: '#FF4500'
+      },
+    ]
+  },
+  {
+    name: '龟类',
+    emoji: '🐢',
+    icon: 'turtle',
+    intro: '陆龟寿命动辄几十年甚至上百年，养之前请认真问自己：30年、50年后你还能照顾它吗？',
+    color: '#8B7355',
+    species: [
+      {
+        name: '赫曼陆龟', latin: 'Testudo hermanni',
+        size: '15-28cm', lifespan: '50-75年',
+        temp: '28-32°C（晒点）/ 22-26°C（冷区）', humidity: '40-60%',
+        enclosure: '120×60cm（室内）+ 户外放养', diet: '纯素食（杂草、蔬菜、龟粮）',
+        temperament: '温和好奇，户外活动性强', beginner: true,
+        difficulty: '⭐⭐', morphs: '东部/西部亚种',
+        desc: '赫曼陆龟是陆龟中体型最小的入门品种之一。纯素食喂养成本低，性格温和。致命伤只有一个：结石。必须保证充足饮水和合适湿度，否则尿酸结晶会导致痛苦的泌尿系统结石。',
+        filterTag: '赫曼陆龟',
+        cardColor: '#8B7355'
+      },
+      {
+        name: '红腿陆龟', latin: 'Chelonoidis carbonarius',
+        size: '30-40cm', lifespan: '50-80年',
+        temp: '26-30°C', humidity: '70-80%',
+        enclosure: '180×120cm（成体室内）', diet: '杂食（蔬果+少量动物蛋白）',
+        temperament: '温顺，比赫曼更活泼', beginner: false,
+        difficulty: '⭐⭐', morphs: '北部/南部亚种',
+        desc: '红腿陆龟比赫曼更大、更活泼、寿命更长。需要高湿度（70-80%）和较大空间。它是少数可以接受少量动物蛋白的陆龟（偶尔喂食煮鸡蛋或煮鸡肉）。怕低温，冬天必须有加温设备。',
+        filterTag: '红腿陆龟',
+        cardColor: '#CD5C5C'
+      },
+      {
+        name: '巴西龟', latin: 'Trachemys scripta elegans',
+        size: '20-30cm', lifespan: '20-40年',
+        temp: '水温24-28°C / 晒台28-32°C', humidity: '水栖，需要水域',
+        enclosure: '80×40×40cm水缸（成体）+ 晒台', diet: '杂食（龟粮+小鱼虾+蔬菜）',
+        temperament: '温和，活泼好游', beginner: true,
+        difficulty: '⭐', morphs: '白化/彩龟等选育型',
+        desc: '巴西龟（红耳龟）是全球最常见的宠物龟，也是最"亲民"的水龟品种。饲养简单：有水、有晒台、有UVB灯就行。杂食性极强，几乎什么都吃。但注意：寿命可达20-40年，且放生会破坏生态——请负责任饲养，绝不放生。',
+        filterTag: '巴西龟',
+        cardColor: '#4682B4'
+      },
+    ]
+  },
+  {
+    name: '哺乳类',
+    emoji: '🦡',
+    icon: 'mammal',
+    intro: '小型哺乳类异宠拥有极高的互动性和情感联结——它们会认人、会撒娇、会在你身上睡觉。但需要更多陪伴时间和更大的活动空间。',
+    color: '#9B59B6',
+    species: [
+      {
+        name: '蜜袋鼯', latin: 'Petaurus breviceps',
+        size: '约30cm（含尾巴）', lifespan: '10-15年',
+        temp: '22-28°C（怕冷！低于20°C可能伪冬眠）', humidity: '50-70%',
+        enclosure: '90×60×90cm（高笼，必须大空间）', diet: '杂食（专用蜜粮+水果+昆虫+蛋白）',
+        temperament: '亲人但需bonding，初期可能咬人', beginner: false,
+        difficulty: '⭐⭐', morphs: '经典灰/白脸/白化等',
+        desc: '蜜袋鼯是有袋类小动物，因身体两侧的滑行膜得名——它们可以在空中滑翔！最大特点是"bonding"：需要每天花时间与它互动建立信任。一旦bonding成功，它会把你当成家人，在你口袋里睡觉。但前期需要耐心，且是夜行性动物，晚上会活跃。',
+        filterTag: '蜜袋鼯',
+        cardColor: '#9B59B6'
+      },
+    ]
+  }
+];
+
+// 为每个物种匹配相关文章
+const speciesWithArticles = speciesGroups.map(group => ({
+  ...group,
+  species: group.species.map(sp => {
+    const articles = allPosts
+      .filter(p => p.data.tags.some(t => t === sp.filterTag))
+      .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+    return { ...sp, articles };
+  })
+}));
+
+// 统计
+const totalSpecies = speciesGroups.reduce((sum, g) => sum + g.species.length, 0);
+const beginnerSpecies = speciesGroups.reduce((sum, g) => sum + g.species.filter(s => s.beginner).length, 0);
+---
+
+<Layout title="物种大全 | 异宠指南" description={`${totalSpecies}种异宠详解：守宫、蛇、蜥蜴、蛙、龟全覆盖。新手推荐、饲养数据、推荐品种一网打尽。`}>
+
+<section class="species-page">
+  <!-- Hero -->
+  <header class="species-hero">
+    <div class="hero-bg">
+      <div class="hero-pattern"></div>
+    </div>
+    <div class="container">
+      <div class="hero-content">
+        <span class="hero-badge">🦎 异宠百科</span>
+        <h1>物种大全</h1>
+        <p class="hero-sub">
+          共收录 <strong>{totalSpecies}</strong> 种异宠，其中 <strong>{beginnerSpecies}</strong> 种适合新手入门。<br/>
+          不知道该养什么？先看完这个页面再说。
+        </p>
+        <div class="hero-stats">
+          <div class="stat">
+            <span class="stat-num">{speciesGroups.length}</span>
+            <span class="stat-label">大类</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num">{totalSpecies}</span>
+            <span class="stat-label">物种</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num">{beginnerSpecies}</span>
+            <span class="stat-label">新手友好</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num">{allPosts.length}</span>
+            <span class="stat-label">篇教程</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Data Visualization Chart -->
+  <section class="chart-section">
+    <div class="container">
+      <SpeciesChart />
+    </div>
+  </section>
+
+  <!-- Quick Compare Table -->
+  <section class="quick-compare">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">快速对比</span>
+        <h2>一眼看懂各物种的核心差异</h2>
+      </div>
+      <div class="table-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>物种</th>
+              <th>难度</th>
+              <th>体长</th>
+              <th>寿命</th>
+              <th>温度</th>
+              <th>湿度</th>
+              <th>食物</th>
+              <th>新手推荐</th>
+            </tr>
+          </thead>
+          <tbody>
+            {speciesGroups.map(group => group.species.map(sp => (
+              <tr>
+                <td class="td-name">
+                  <strong>{sp.name}</strong>
+                  <br/><small>{sp.latin}</small>
+                </td>
+                <td class="td-center">{sp.difficulty}</td>
+                <td>{sp.size}</td>
+                <td>{sp.lifespan}</td>
+                <td>{sp.temp}</td>
+                <td>{sp.humidity}</td>
+                <td>{sp.diet}</td>
+                <td class="td-center">
+                  <span class={`recommend-badge ${sp.beginner ? 'beginner' : 'advanced'}`}>
+                    {sp.beginner ? '✅ 推荐' : '⚡ 进阶'}
+                  </span>
+                </td>
+              </tr>
+            )))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Species Detail Cards by Group -->
+  <div class="species-content">
+    {speciesWithArticles.map(group => (
+      <section class="species-group" id={group.name}>
+        <div class="container">
+          <div class="group-header" style={`--group-color: ${group.color}`}>
+            <div class="group-header-left">
+              <span class="group-emoji">{group.emoji}</span>
+              <div class="group-info">
+                <h2 class="group-name">{group.name}</h2>
+                <p class="group-intro">{group.intro}</p>
+              </div>
+            </div>
+            <span class="group-count">{group.species.length} 种</span>
+          </div>
+
+          <div class="species-grid">
+            {group.species.map(sp => (
+              <div class="species-card" style={`--card-accent: ${sp.cardColor}`}>
+                <div class="species-card-top">
+                  <div class="species-name-row">
+                    <h3 class="species-name">{sp.name}</h3>
+                    {sp.beginner && <span class="beginner-badge">新手推荐</span>}
+                  </div>
+                  <p class="species-latin">{sp.latin}</p>
+                </div>
+
+                <p class="species-desc">{sp.desc}</p>
+
+                <!-- 数据网格 -->
+                <div class="data-grid">
+                  <div class="data-item">
+                    <span class="data-icon">📏</span>
+                    <div><span class="data-label">体长</span><span class="data-value">{sp.size}</span></div>
+                  </div>
+                  <div class="data-item">
+                    <span class="data-icon">⏳</span>
+                    <div><span class="data-label">寿命</span><span class="data-value">{sp.lifespan}</span></div>
+                  </div>
+                  <div class="data-item">
+                    <span class="data-icon">🌡️</span>
+                    <div><span class="data-label">温度</span><span class="data-value">{sp.temp}</span></div>
+                  </div>
+                  <div class="data-item">
+                    <span class="data-icon">💧</span>
+                    <div><span class="data-label">湿度</span><span class="data-value">{sp.humidity}</span></div>
+                  </div>
+                  <div class="data-item full">
+                    <span class="data-icon">🏠</span>
+                    <div><span class="data-label">饲养箱</span><span class="data-value">{sp.enclosure}</span></div>
+                  </div>
+                  <div class="data-item full">
+                    <span class="data-icon">🍽️</span>
+                    <div><span class="data-label">食物</span><span class="data-value">{sp.diet}</span></div>
+                  </div>
+                </div>
+
+                <div class="species-temperament">
+                  <span class="temperament-label">性格：</span>{sp.temperament}
+                </div>
+
+                <!-- 关联文章 -->
+                {sp.articles.length > 0 && (
+                  <div class="species-links">
+                    <span class="links-label">📖 相关教程（{sp.articles.length}篇）</span>
+                    <div class="links-list">
+                      {sp.articles.map(article => (
+                        <a href={`/blog/${article.slug}.html`} class="article-link">
+                          {article.data.title}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {sp.articles.length === 0 && (
+                  <div class="species-links-empty">📝 教程撰写中，敬请期待</div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    ))}
+
+    <!-- 还在纠结？ -->
+    <section class="starter-guide">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-eyebrow">选择困难？</span>
+          <h2>还在纠结选什么？</h2>
+          <p class="section-desc">按你的条件，找到最适合的异宠</p>
+        </div>
+
+        <div class="guide-cards">
+          <div class="guide-card recommend">
+            <div class="guide-icon">🏆</div>
+            <h3>最省心入门</h3>
+            <p>不想养虫子？睫角守宫吃果泥就行。<br/>不想管温湿度？豹纹守宫最耐操。<br/>不想每天喂？角蛙一周喂一次。</p>
+            <span class="guide-tag">豹纹守宫 · 睫角守宫 · 角蛙</span>
+          </div>
+          <div class="guide-card">
+            <div class="guide-icon">🤝</div>
+            <h3>最亲人互动</h3>
+            <p>想要会认你的宠物？鬃狮蜥是"蜥蜴界的金毛"。<br/>想要温顺可上手？玉米蛇从来不咬人。</p>
+            <span class="guide-tag">鬃狮蜥 · 玉米蛇</span>
+          </div>
+          <div class="guide-card">
+            <div class="guide-icon">🏠</div>
+            <h3>小空间之选</h3>
+            <p>桌面就能养？瘤尾守宫用30cm小缸。<br/>宿舍也能藏？角蛙用一个收纳盒就行。</p>
+            <span class="guide-tag">角蛙 · 瘤尾守宫 · 豹纹守宫</span>
+          </div>
+          <div class="guide-card">
+            <div class="guide-icon">💪</div>
+            <h3>颜值担当</h3>
+            <p>追求视觉震撼？巨人守宫是守宫界的坦克。<br/>喜欢色彩斑斓？球蟒五千种品系随便挑。</p>
+            <span class="guide-tag">巨人守宫 · 球蟒 · 番茄蛙</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <div class="species-cta">
+      <div class="container">
+        <p>确定目标了吗？从新手指南开始——</p>
+        <a href="/blog.html" class="btn btn-primary btn-lg">
+          浏览全部教程
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</Layout>
+
+<style>
+  .species-page {
+    overflow-x: hidden;
+  }
+
+  .container {
+    max-width: var(--max-width-xl);
+    margin: 0 auto;
+    padding: 0 var(--space-5);
+  }
+
+  /* ===== Hero ===== */
+  .species-hero {
+    position: relative;
+    padding: var(--space-16) 0;
+    background: linear-gradient(135deg, var(--forest-600) 0%, var(--forest-800) 100%);
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .hero-pattern {
+    position: absolute;
+    inset: 0;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: var(--space-4);
+    color: white;
+  }
+
+  .species-hero h1 {
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-weight: 700;
+    margin-bottom: var(--space-4);
+    color: white;
+  }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    color: var(--forest-200);
+    line-height: 1.8;
+    max-width: 600px;
+    margin: 0 auto var(--space-8);
+  }
+
+  .hero-sub strong {
+    color: var(--color-accent);
+  }
+
+  .hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-8);
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .stat-num {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: white;
+  }
+
+  .stat-label {
+    font-size: 0.9rem;
+    color: var(--forest-300);
+  }
+
+  /* ===== Quick Compare ===== */
+  .quick-compare {
+    padding: var(--space-12) 0;
+    background: var(--color-surface);
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: var(--space-8);
+  }
+
+  .section-eyebrow {
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: var(--space-2);
+  }
+
+  .section-header h2 {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    color: var(--forest-900);
+    margin-bottom: var(--space-2);
+  }
+
+  .section-desc {
+    font-size: 1.05rem;
+    color: var(--color-text-secondary);
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+  }
+
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    min-width: 900px;
+  }
+
+  .compare-table th {
+    background: var(--forest-50);
+    color: var(--forest-800);
+    font-weight: 600;
+    padding: var(--space-3) var(--space-3);
+    text-align: left;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  .compare-table td {
+    padding: var(--space-3);
+    border-bottom: 1px solid var(--color-border-light);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+
+  .compare-table small {
+    color: var(--color-text-muted);
+    font-style: italic;
+    font-size: 0.8rem;
+  }
+
+  .td-name strong {
+    color: var(--color-text);
+  }
+
+  .td-center {
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .compare-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .compare-table tr:hover td {
+    background: var(--forest-50);
+  }
+
+  .recommend-badge {
+    display: inline-block;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .recommend-badge.beginner {
+    background: var(--forest-100);
+    color: var(--forest-700);
+  }
+
+  .recommend-badge.advanced {
+    background: var(--earth-100);
+    color: var(--earth-700);
+  }
+
+  /* ===== Species Groups ===== */
+  .species-content {
+    padding-bottom: var(--space-16);
+  }
+
+  .species-group {
+    padding: var(--space-12) 0;
+  }
+
+  .species-group:nth-child(even) {
+    background: var(--forest-50);
+  }
+
+  .group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-8);
+    padding-bottom: var(--space-4);
+    border-bottom: 3px solid var(--group-color);
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .group-header-left {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+
+  .group-emoji {
+    font-size: 3rem;
+    line-height: 1;
+  }
+
+  .group-name {
+    font-size: 1.75rem;
+    margin-bottom: var(--space-2);
+    color: var(--forest-900);
+  }
+
+  .group-intro {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    max-width: 600px;
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .group-count {
+    font-size: 0.9rem;
+    background: var(--group-color);
+    color: white;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+    font-weight: 600;
+  }
+
+  /* ===== Species Cards ===== */
+  .species-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-5);
+  }
+
+  .species-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-5);
+    transition: all var(--transition-base);
+    border-top: 4px solid var(--card-accent);
+  }
+
+  .species-card:hover {
+    border-color: var(--card-accent);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+  }
+
+  .species-name-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-1);
+    flex-wrap: wrap;
+  }
+
+  .species-name {
+    font-size: 1.25rem;
+    margin: 0;
+    color: var(--color-text);
+  }
+
+  .beginner-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    background: var(--forest-100);
+    color: var(--forest-700);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-full);
+    font-weight: 600;
+  }
+
+  .species-latin {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    font-style: italic;
+    margin-bottom: var(--space-3);
+  }
+
+  .species-desc {
+    font-size: 0.95rem;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin-bottom: var(--space-4);
+  }
+
+  /* Data Grid */
+  .data-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+    padding: var(--space-4);
+    background: var(--stone-50);
+    border-radius: var(--radius-lg);
+  }
+
+  .data-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    font-size: 0.85rem;
+  }
+
+  .data-item.full {
+    grid-column: 1 / -1;
+  }
+
+  .data-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .data-label {
+    color: var(--color-text-muted);
+    margin-right: var(--space-1);
+    font-size: 0.8rem;
+  }
+
+  .data-value {
+    color: var(--color-text);
+    font-weight: 500;
+    line-height: 1.5;
+    font-size: 0.85rem;
+  }
+
+  .species-temperament {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    padding: var(--space-3);
+    background: var(--forest-50);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-4);
+  }
+
+  .temperament-label {
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+  }
+
+  /* Article Links */
+  .species-links {
+    border-top: 1px solid var(--color-border-light);
+    padding-top: var(--space-4);
+  }
+
+  .links-label {
+    font-size: 0.85rem;
+    color: var(--color-primary);
+    font-weight: 600;
+    display: block;
+    margin-bottom: var(--space-2);
+  }
+
+  .links-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .article-link {
+    font-size: 0.9rem;
+    color: var(--color-primary);
+    text-decoration: none;
+    padding-left: var(--space-3);
+    border-left: 2px solid var(--forest-200);
+    transition: all var(--transition-fast);
+  }
+
+  .article-link:hover {
+    border-left-color: var(--color-primary);
+    color: var(--forest-800);
+    padding-left: var(--space-4);
+  }
+
+  .species-links-empty {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    font-style: italic;
+    padding-top: var(--space-3);
+  }
+
+  /* ===== Starter Guide ===== */
+  .starter-guide {
+    padding: var(--space-16) 0;
+    background: linear-gradient(180deg, var(--earth-50) 0%, var(--forest-50) 100%);
+  }
+
+  .guide-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-5);
+  }
+
+  .guide-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    text-align: center;
+    transition: all var(--transition-base);
+  }
+
+  .guide-card:hover {
+    border-color: var(--forest-300);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+  }
+
+  .guide-card.recommend {
+    border-color: var(--color-primary);
+    background: linear-gradient(135deg, var(--forest-50) 0%, var(--color-surface) 100%);
+  }
+
+  .guide-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-4);
+  }
+
+  .guide-card h3 {
+    font-size: 1.15rem;
+    margin-bottom: var(--space-3);
+    color: var(--forest-800);
+  }
+
+  .guide-card p {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin-bottom: var(--space-4);
+    text-align: left;
+  }
+
+  .guide-tag {
+    display: inline-block;
+    font-size: 0.8rem;
+    color: var(--color-primary);
+    font-weight: 500;
+  }
+
+  /* ===== CTA ===== */
+  .species-cta {
+    padding: var(--space-12) 0;
+    text-align: center;
+    background: var(--color-surface);
+  }
+
+  .species-cta p {
+    font-size: 1.1rem;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-5);
+  }
+
+  .btn-lg {
+    padding: var(--space-4) var(--space-8);
+    font-size: 1.05rem;
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 1024px) {
+    .guide-cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .species-hero {
+      padding: var(--space-10) 0;
+    }
+
+    .species-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .guide-cards {
+      grid-template-columns: 1fr;
+    }
+
+    .group-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .hero-stats {
+      gap: var(--space-5);
+    }
+
+    .stat-num {
+      font-size: 1.75rem;
+    }
+  }
+</style>

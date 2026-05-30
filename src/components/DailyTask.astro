@@ -1,0 +1,292 @@
+---
+// 每日任务追踪组件
+---
+
+<div class="daily-task-widget" id="dailyTaskWidget">
+  <div class="task-header">
+    <span class="task-icon">📋</span>
+    <h4>今日饲养任务</h4>
+    <span class="task-date" id="taskDate"></span>
+  </div>
+  
+  <div class="task-list" id="taskList">
+    <div class="task-item" data-task="temp">
+      <label class="task-label">
+        <input type="checkbox" class="task-checkbox" />
+        <span class="task-text">
+          <span class="task-name">检查温度</span>
+          <span class="task-desc">确认热点温度在正常范围</span>
+        </span>
+      </label>
+    </div>
+    
+    <div class="task-item" data-task="water">
+      <label class="task-label">
+        <input type="checkbox" class="task-checkbox" />
+        <span class="task-text">
+          <span class="task-name">更换饮水</span>
+          <span class="task-desc">提供新鲜的饮用水</span>
+        </span>
+      </label>
+    </div>
+    
+    <div class="task-item" data-task="observe">
+      <label class="task-label">
+        <input type="checkbox" class="task-checkbox" />
+        <span class="task-text">
+          <span class="task-name">观察状态</span>
+          <span class="task-desc">检查精神状态和排泄情况</span>
+        </span>
+      </label>
+    </div>
+    
+    <div class="task-item" data-task="feed">
+      <label class="task-label">
+        <input type="checkbox" class="task-checkbox" />
+        <span class="task-text">
+          <span class="task-name">喂食</span>
+          <span class="task-desc">根据物种需求喂食适量食物</span>
+        </span>
+      </label>
+    </div>
+  </div>
+  
+  <div class="task-progress">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <span class="progress-text" id="progressText">0/4 完成</span>
+  </div>
+  
+  <div class="task-streak">
+    <span class="streak-icon">🔥</span>
+    <span class="streak-text">连续打卡 <strong id="streakCount">0</strong> 天</span>
+  </div>
+</div>
+
+<script>
+  // 每日任务功能
+  const widget = document.getElementById('dailyTaskWidget');
+  if (widget) {
+    const checkboxes = widget.querySelectorAll('.task-checkbox');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const streakCount = document.getElementById('streakCount');
+    const taskDate = document.getElementById('taskDate');
+    
+    // 显示日期
+    const today = new Date();
+    taskDate.textContent = today.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+    
+    // 获取存储键
+    const dateKey = today.toISOString().split('T')[0];
+    const storageKey = `tasks_${dateKey}`;
+    const streakKey = 'task_streak';
+    const lastCompleteKey = 'last_complete_date';
+    
+    // 加载今日任务状态
+    const savedTasks = localStorage.getItem(storageKey);
+    if (savedTasks) {
+      const states = JSON.parse(savedTasks);
+      checkboxes.forEach((cb, i) => {
+        cb.checked = states[i] || false;
+      });
+    }
+    
+    // 加载连续打卡天数
+    const savedStreak = localStorage.getItem(streakKey);
+    streakCount.textContent = savedStreak || '0';
+    
+    // 更新进度
+    function updateProgress() {
+      const total = checkboxes.length;
+      const completed = widget.querySelectorAll('.task-checkbox:checked').length;
+      const percentage = (completed / total) * 100;
+      
+      progressFill.style.width = `${percentage}%`;
+      progressText.textContent = `${completed}/${total} 完成`;
+      
+      // 保存状态
+      const states = Array.from(checkboxes).map(cb => cb.checked);
+      localStorage.setItem(storageKey, JSON.stringify(states));
+      
+      // 全部完成时更新连续打卡
+      if (completed === total) {
+        const lastComplete = localStorage.getItem(lastCompleteKey);
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayKey = yesterday.toISOString().split('T')[0];
+        
+        let streak = parseInt(localStorage.getItem(streakKey) || '0');
+        
+        if (lastComplete === yesterdayKey || !lastComplete) {
+          streak++;
+        } else if (lastComplete !== dateKey) {
+          streak = 1;
+        }
+        
+        localStorage.setItem(streakKey, streak);
+        localStorage.setItem(lastCompleteKey, dateKey);
+        streakCount.textContent = streak;
+        
+        // 庆祝动画
+        widget.classList.add('completed');
+      }
+    }
+    
+    // 绑定事件
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', updateProgress);
+    });
+    
+    // 初始化进度
+    updateProgress();
+  }
+</script>
+
+<style>
+  .daily-task-widget {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-5);
+    margin: var(--space-6) 0;
+  }
+
+  .daily-task-widget.completed {
+    border-color: var(--success-500);
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  }
+
+  .task-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  .task-icon {
+    font-size: 1.25rem;
+  }
+
+  .task-header h4 {
+    flex: 1;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .task-date {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+
+  .task-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+
+  .task-item {
+    background: var(--stone-50);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+  }
+
+  .task-item:hover {
+    background: var(--forest-50);
+  }
+
+  .task-label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    cursor: pointer;
+  }
+
+  .task-checkbox {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    accent-color: var(--color-primary);
+  }
+
+  .task-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .task-name {
+    font-weight: 500;
+    color: var(--color-text);
+    font-size: 0.95rem;
+  }
+
+  .task-desc {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+  }
+
+  .task-checkbox:checked + .task-text .task-name {
+    text-decoration: line-through;
+    color: var(--color-text-muted);
+  }
+
+  .task-progress {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+
+  .progress-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--stone-200);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+    border-radius: var(--radius-full);
+    transition: width 0.3s ease;
+  }
+
+  .progress-text {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .task-streak {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    background: var(--color-accent-light);
+    border-radius: var(--radius-md);
+  }
+
+  .streak-icon {
+    font-size: 1.25rem;
+  }
+
+  .streak-text {
+    font-size: 0.9rem;
+    color: var(--color-text);
+  }
+
+  .streak-text strong {
+    color: var(--color-accent-dark);
+  }
+</style>

@@ -1,0 +1,276 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="我的收藏 | 异宠指南" description="查看你收藏的所有异宠饲养文章，方便随时回顾学习。">
+  <section class="favorites-page">
+    <div class="container">
+      <!-- Header -->
+      <header class="page-header">
+        <span class="page-badge">⭐ 我的收藏</span>
+        <h1>收藏的文章</h1>
+        <p class="page-desc">你收藏的所有精彩内容，都在这里</p>
+      </header>
+
+      <!-- Favorites List -->
+      <div class="favorites-container" id="favorites-container">
+        <div class="favorites-empty" id="favorites-empty">
+          <span class="empty-icon">📚</span>
+          <h3>还没有收藏任何文章</h3>
+          <p>浏览文章时点击"收藏"按钮，即可在这里找到它们</p>
+          <a href="/blog.html" class="btn btn-primary">去浏览文章</a>
+        </div>
+        
+        <div class="favorites-list" id="favorites-list" style="display: none;">
+          <!-- 动态渲染 -->
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  const STORAGE_KEY = 'favorites';
+  
+  // 获取收藏
+  function getFavorites() {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  }
+  
+  // 移除收藏
+  function removeFavorite(slug) {
+    const favorites = getFavorites();
+    const filtered = favorites.filter(f => f.slug !== slug);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+    return filtered;
+  }
+  
+  // 渲染收藏列表
+  function renderFavorites() {
+    const favorites = getFavorites();
+    const emptyEl = document.getElementById('favorites-empty');
+    const listEl = document.getElementById('favorites-list');
+    
+    if (favorites.length === 0) {
+      emptyEl.style.display = 'block';
+      listEl.style.display = 'none';
+      return;
+    }
+    
+    emptyEl.style.display = 'none';
+    listEl.style.display = 'grid';
+    
+    listEl.innerHTML = favorites.map(fav => `
+      <article class="favorite-card">
+        <div class="card-content">
+          <h3 class="card-title">
+            <a href="/blog/${fav.slug}.html">${escapeHtml(fav.title)}</a>
+          </h3>
+          <time class="card-date">收藏于 ${formatDate(fav.date)}</time>
+        </div>
+        <div class="card-actions">
+          <a href="/blog/${fav.slug}.html" class="btn btn-secondary btn-sm">阅读</a>
+          <button class="btn btn-ghost btn-sm remove-btn" data-slug="${fav.slug}">
+            移除
+          </button>
+        </div>
+      </article>
+    `).join('');
+    
+    // 绑定移除事件
+    listEl.querySelectorAll('.remove-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const slug = btn.dataset.slug;
+        removeFavorite(slug);
+        renderFavorites();
+        showToast('已移除收藏');
+      });
+    });
+  }
+  
+  // 转义HTML
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  
+  // 格式化日期
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('zh-CN', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  }
+  
+  // Toast提示
+  function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 2000);
+  }
+  
+  // 初始化
+  renderFavorites();
+</script>
+
+<style>
+  .favorites-page {
+    padding: var(--space-12) 0 var(--space-16);
+    min-height: calc(100vh - var(--header-height) - 400px);
+  }
+
+  .container {
+    max-width: var(--max-width-xl);
+    margin: 0 auto;
+    padding: 0 var(--space-5);
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: var(--space-10);
+  }
+
+  .page-badge {
+    display: inline-block;
+    padding: var(--space-2) var(--space-4);
+    background: var(--forest-100);
+    color: var(--forest-700);
+    border-radius: var(--radius-full);
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: var(--space-4);
+  }
+
+  .page-header h1 {
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    margin-bottom: var(--space-3);
+    color: var(--forest-900);
+  }
+
+  .page-desc {
+    font-size: 1.1rem;
+    color: var(--color-text-secondary);
+  }
+
+  /* Empty State */
+  .favorites-empty {
+    text-align: center;
+    padding: var(--space-16) var(--space-5);
+    background: var(--forest-50);
+    border-radius: var(--radius-xl);
+  }
+
+  .empty-icon {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: var(--space-4);
+  }
+
+  .favorites-empty h3 {
+    font-size: 1.25rem;
+    margin-bottom: var(--space-2);
+    color: var(--color-text);
+  }
+
+  .favorites-empty p {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-5);
+  }
+
+  /* Favorites List */
+  .favorites-list {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .favorite-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    transition: all var(--transition-base);
+  }
+
+  .favorite-card:hover {
+    border-color: var(--forest-300);
+    box-shadow: var(--shadow-md);
+  }
+
+  .card-content {
+    flex: 1;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+    margin-bottom: var(--space-2);
+  }
+
+  .card-title a {
+    color: var(--color-text);
+  }
+
+  .card-title a:hover {
+    color: var(--color-primary);
+  }
+
+  .card-date {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+
+  .card-actions {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .btn-sm {
+    padding: var(--space-2) var(--space-3);
+    font-size: 0.85rem;
+  }
+
+  :global(.toast) {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--forest-800);
+    color: white;
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--radius-full);
+    font-size: 0.95rem;
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+
+  :global(.toast.show) {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+  @media (max-width: 640px) {
+    .favorite-card {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .card-actions {
+      width: 100%;
+    }
+  }
+</style>

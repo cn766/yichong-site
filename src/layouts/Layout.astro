@@ -1,0 +1,298 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: string;
+  noindex?: boolean;
+}
+
+const { 
+  title = '异宠指南', 
+  description = '中国第一个异宠新手系统化饲养指南——守宫、玉米蛇、鬃狮蜥、角蛙全面饲养知识。从零开始，科学饲养。',
+  image = '/images/og-default.png',
+  type = 'website',
+  noindex = false
+} = Astro.props;
+
+const siteUrl = 'https://yichongzhinan.com';
+const pageUrl = new URL(Astro.url.pathname, siteUrl).toString();
+const fullImageUrl = new URL(image, siteUrl).toString();
+const pageTitle = title === '异宠指南' ? title : `${title} | 异宠指南`;
+
+// Google Analytics & Search Console
+const gaId = import.meta.env.PUBLIC_GA_ID;
+const gscCode = import.meta.env.PUBLIC_GSC_CODE;
+
+// 百度统计
+const baiduHmId = import.meta.env.PUBLIC_BAIDU_HM_ID || '1bcb13a8a510610b9e76f28f4db0447d';
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#3a6f3a" />
+    
+    <!-- Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    
+    <!-- Primary Meta Tags -->
+    <title>{pageTitle}</title>
+    <meta name="title" content={pageTitle} />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={pageUrl} />
+    {noindex && <meta name="robots" content="noindex,nofollow" />}
+    
+    <!-- Google Search Console -->
+    {gscCode && <meta name="google-site-verification" content={gscCode} />}
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={fullImageUrl} />
+    <meta property="og:site_name" content="异宠指南" />
+    <meta property="og:locale" content="zh_CN" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={pageUrl} />
+    <meta property="twitter:title" content={pageTitle} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={fullImageUrl} />
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="异宠指南" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="异宠指南" />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "异宠指南",
+      "description": "中国第一个异宠新手系统化饲养指南",
+      "url": siteUrl,
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": `${siteUrl}/blog.html?q={search_term_string}`
+        },
+        "query-input": "required name=search_term_string"
+      }
+    })} />
+    
+    <!-- Google Analytics (GA4) -->
+    {gaId && (
+      <>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
+        <script define:vars={{ gaId }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', gaId);
+        </script>
+      </>
+    )}
+    
+    <!-- 百度统计 -->
+    <script define:vars={{ baiduHmId }}>
+      var _hmt = _hmt || [];
+      (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?" + baiduHmId;
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();
+    </script>
+  </head>
+  <body>
+    <!-- Page Loading Animation -->
+    <div id="page-loader" class="page-loader">
+      <div class="loader-content">
+        <span class="loader-icon">🦎</span>
+        <span class="loader-text">加载中...</span>
+      </div>
+    </div>
+    
+    <Header />
+    <main id="main-content">
+      <slot />
+    </main>
+    <Footer />
+    
+    <!-- Back to Top Button -->
+    <button id="back-to-top" class="back-to-top" aria-label="回到顶部">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m18 15-6-6-6 6"/>
+      </svg>
+    </button>
+    
+    <script>
+      // Page loader
+      const pageLoader = document.getElementById('page-loader');
+      
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          pageLoader?.classList.add('hidden');
+          setTimeout(() => {
+            pageLoader?.remove();
+          }, 500);
+        }, 300);
+      });
+      
+      // Back to top button
+      const backToTop = document.getElementById('back-to-top');
+      
+      window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 500) {
+          backToTop?.classList.add('visible');
+        } else {
+          backToTop?.classList.remove('visible');
+        }
+      });
+      
+      backToTop?.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      
+      // Register Service Worker
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW注册成功:', registration.scope);
+            })
+            .catch((error) => {
+              console.log('SW注册失败:', error);
+            });
+        });
+      }
+
+      // Smooth scroll for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          const href = this.getAttribute('href');
+          if (href !== '#') {
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+              target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }
+        });
+      });
+    </script>
+    
+    <style>
+      /* Page Loader */
+      .page-loader {
+        position: fixed;
+        inset: 0;
+        background: var(--color-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+      }
+      
+      .page-loader.hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+      
+      .loader-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-3);
+      }
+      
+      .loader-icon {
+        font-size: 4rem;
+        animation: loaderBounce 1s ease infinite;
+      }
+      
+      .loader-text {
+        font-size: 1rem;
+        color: var(--color-text-secondary);
+        animation: loaderPulse 1.5s ease infinite;
+      }
+      
+      @keyframes loaderBounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+      }
+      
+      @keyframes loaderPulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+      
+      .back-to-top {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        width: 48px;
+        height: 48px;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-full);
+        color: var(--color-text-secondary);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: all var(--transition-base);
+        box-shadow: var(--shadow-lg);
+        z-index: 90;
+      }
+      
+      .back-to-top.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+      
+      .back-to-top:hover {
+        background: var(--color-primary);
+        color: white;
+        border-color: var(--color-primary);
+        transform: translateY(-2px);
+      }
+      
+      @media (max-width: 768px) {
+        .back-to-top {
+          bottom: 1.5rem;
+          right: 1.5rem;
+          width: 44px;
+          height: 44px;
+        }
+      }
+    </style>
+  </body>
+</html>

@@ -1,0 +1,165 @@
+---
+interface Props {
+  author: string;
+  avatar?: string;
+  petName: string;
+  petType: string;
+  quote: string;
+  story: string;
+  tips?: string[];
+}
+
+const { author, avatar, petName, petType, quote, story, tips = [] } = Astro.props;
+---
+
+<div class="user-story">
+  <div class="story-header">
+    <div class="author-info">
+      <div class="author-avatar">
+        {avatar ? (
+          <img src={avatar} alt={author} />
+        ) : (
+          <span>{author.charAt(0)}</span>
+        )}
+      </div>
+      <div class="author-meta">
+        <span class="author-name">{author}</span>
+        <span class="pet-info">{petName}的铲屎官 · {petType}</span>
+      </div>
+    </div>
+  </div>
+  
+  <blockquote class="story-quote">
+    "{quote}"
+  </blockquote>
+  
+  <div class="story-content">
+    <p>{story}</p>
+  </div>
+  
+  {tips.length > 0 && (
+    <div class="story-tips">
+      <h5>💡 经验分享</h5>
+      <ul>
+        {tips.map(tip => (
+          <li>{tip}</li>
+        ))}
+      </ul>
+    </div>
+  )}
+</div>
+
+<style>
+  .user-story {
+    background: linear-gradient(135deg, #fef7e8 0%, #fff8e7 100%);
+    border-left: 4px solid var(--color-accent);
+    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+    padding: var(--space-5);
+    margin: var(--space-6) 0;
+  }
+
+  .story-header {
+    margin-bottom: var(--space-4);
+  }
+
+  .author-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .author-avatar {
+    width: 48px;
+    height: 48px;
+    background: var(--color-primary);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 1.25rem;
+    overflow: hidden;
+  }
+
+  .author-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .author-meta {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .author-name {
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .pet-info {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+
+  .story-quote {
+    font-size: 1.1rem;
+    font-style: italic;
+    color: var(--forest-800);
+    margin: 0 0 var(--space-4) 0;
+    padding: var(--space-3) var(--space-4);
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: var(--radius-md);
+    position: relative;
+  }
+
+  .story-quote::before {
+    content: '"';
+    font-size: 3rem;
+    color: var(--color-accent);
+    opacity: 0.3;
+    position: absolute;
+    top: -10px;
+    left: 10px;
+    line-height: 1;
+  }
+
+  .story-content {
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    margin-bottom: var(--space-4);
+  }
+
+  .story-content p {
+    margin: 0;
+  }
+
+  .story-tips {
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+  }
+
+  .story-tips h5 {
+    font-size: 0.95rem;
+    color: var(--color-text);
+    margin-bottom: var(--space-2);
+    margin-top: 0;
+  }
+
+  .story-tips ul {
+    margin: 0;
+    padding-left: var(--space-5);
+  }
+
+  .story-tips li {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-1);
+  }
+
+  .story-tips li:last-child {
+    margin-bottom: 0;
+  }
+</style>

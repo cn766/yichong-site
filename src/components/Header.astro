@@ -1,0 +1,313 @@
+---
+import SearchModal from './SearchModal.astro';
+---
+<header class="site-header" id="site-header">
+  <div class="header-inner">
+    <a href="/" class="logo">
+      <span class="logo-icon">🌿</span>
+      <span class="logo-text">异宠指南</span>
+    </a>
+    
+    <nav class="nav" id="nav">
+      <a href="/" class="nav-link" data-active={Astro.url.pathname === '/'}>
+        <span class="nav-icon">🏠</span>
+        <span>首页</span>
+      </a>
+      <a href="/species.html" class="nav-link" data-active={Astro.url.pathname === '/species.html'}>
+        <span class="nav-icon">🦎</span>
+        <span>物种大全</span>
+      </a>
+      <a href="/blog.html" class="nav-link" data-active={Astro.url.pathname === '/blog.html' || Astro.url.pathname.startsWith('/blog/')}>
+        <span class="nav-icon">📚</span>
+        <span>文章</span>
+      </a>
+      <a href="/about.html" class="nav-link" data-active={Astro.url.pathname === '/about.html'}>
+        <span class="nav-icon">ℹ️</span>
+        <span>关于</span>
+      </a>
+      <a href="/favorites.html" class="nav-link" data-active={Astro.url.pathname === '/favorites.html'}>
+        <span class="nav-icon">⭐</span>
+        <span>收藏</span>
+      </a>
+    </nav>
+
+    <div class="header-actions">
+      <button class="search-trigger" id="search-trigger" aria-label="搜索">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.3-4.3"></path>
+        </svg>
+        <span class="search-shortcut">⌘K</span>
+      </button>
+      
+      <button class="menu-toggle" id="menu-toggle" aria-label="打开菜单">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<SearchModal />
+
+<script>
+  // Mobile menu toggle
+  const toggle = document.getElementById('menu-toggle');
+  const nav = document.getElementById('nav');
+  toggle?.addEventListener('click', () => {
+    nav?.classList.toggle('open');
+    toggle.classList.toggle('active');
+    toggle.setAttribute('aria-expanded', nav?.classList.contains('open') ? 'true' : 'false');
+  });
+
+  // Search modal trigger
+  const searchTrigger = document.getElementById('search-trigger');
+  const searchModal = document.getElementById('search-modal');
+  
+  searchTrigger?.addEventListener('click', () => {
+    searchModal?.classList.add('open');
+    const searchInput = document.getElementById('search-input');
+    searchInput?.focus();
+  });
+
+  // Keyboard shortcut for search
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      searchModal?.classList.add('open');
+      const searchInput = document.getElementById('search-input');
+      searchInput?.focus();
+    }
+    if (e.key === 'Escape') {
+      searchModal?.classList.remove('open');
+    }
+  });
+
+  // Header scroll effect
+  const header = document.getElementById('site-header');
+  let lastScroll = 0;
+  
+  window.addEventListener('scroll', () => {
+    const currentScroll = window.pageYOffset;
+    
+    if (currentScroll > 50) {
+      header?.classList.add('scrolled');
+    } else {
+      header?.classList.remove('scrolled');
+    }
+    
+    lastScroll = currentScroll;
+  });
+</script>
+
+<style>
+  .site-header {
+    background: rgba(250, 248, 245, 0.85);
+    border-bottom: 1px solid var(--color-border-light);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: all var(--transition-base);
+  }
+
+  .site-header.scrolled {
+    background: rgba(250, 248, 245, 0.95);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .header-inner {
+    max-width: var(--max-width-xl);
+    margin: 0 auto;
+    padding: 0 var(--space-5);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--header-height);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--color-primary-dark);
+    text-decoration: none;
+    flex-shrink: 0;
+    transition: transform var(--transition-fast);
+  }
+
+  .logo:hover {
+    transform: scale(1.02);
+  }
+
+  .logo-icon {
+    font-size: 1.5rem;
+    filter: drop-shadow(0 2px 4px rgba(74, 138, 74, 0.2));
+  }
+
+  .nav {
+    display: flex;
+    gap: var(--space-1);
+    align-items: center;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    text-decoration: none;
+  }
+
+  .nav-link:hover {
+    color: var(--color-primary);
+    background: var(--forest-50);
+  }
+
+  .nav-link[data-active="true"] {
+    color: var(--color-primary);
+    background: var(--forest-100);
+    font-weight: 600;
+  }
+
+  .nav-icon {
+    font-size: 1.1rem;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .search-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: var(--color-surface);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .search-trigger:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: var(--forest-50);
+  }
+
+  .search-shortcut {
+    font-size: 0.75rem;
+    padding: 0.1rem 0.4rem;
+    background: var(--stone-100);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    font-family: monospace;
+  }
+
+  /* Mobile menu toggle */
+  .menu-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--space-2);
+    border-radius: var(--radius-md);
+    transition: background var(--transition-fast);
+  }
+
+  .menu-toggle:hover {
+    background: var(--stone-100);
+  }
+
+  .hamburger-line {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--color-text);
+    border-radius: 1px;
+    transition: transform 0.2s, opacity 0.2s;
+  }
+
+  .menu-toggle.active .hamburger-line:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .menu-toggle.active .hamburger-line:nth-child(2) {
+    opacity: 0;
+  }
+
+  .menu-toggle.active .hamburger-line:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  @media (max-width: 768px) {
+    .header-inner {
+      padding: 0 var(--space-4);
+    }
+
+    .menu-toggle {
+      display: flex;
+    }
+
+    .nav {
+      display: none;
+      position: absolute;
+      top: var(--header-height);
+      left: 0;
+      right: 0;
+      background: rgba(250, 248, 245, 0.98);
+      flex-direction: column;
+      padding: var(--space-4);
+      gap: var(--space-2);
+      border-bottom: 1px solid var(--color-border-light);
+      box-shadow: var(--shadow-lg);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav.open {
+      display: flex;
+    }
+
+    .nav-link {
+      width: 100%;
+      padding: var(--space-3) var(--space-4);
+      justify-content: flex-start;
+    }
+
+    .search-shortcut {
+      display: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .logo-text {
+      display: none;
+    }
+
+    .search-trigger {
+      padding: var(--space-2);
+    }
+
+    .search-trigger svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+</style>

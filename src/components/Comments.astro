@@ -1,0 +1,366 @@
+---
+interface Props {
+  postSlug: string;
+}
+
+const { postSlug } = Astro.props;
+---
+
+<div class="comments-section" data-post-slug={postSlug}>
+  <h3 class="comments-title">💬 评论区</h3>
+  
+  <!-- 评论表单 -->
+  <form class="comment-form" id="comment-form">
+    <div class="form-row">
+      <div class="form-group">
+        <label for="comment-name">昵称</label>
+        <input type="text" id="comment-name" name="name" required placeholder="你的昵称" />
+      </div>
+      <div class="form-group">
+        <label for="comment-email">邮箱（不会公开）</label>
+        <input type="email" id="comment-email" name="email" required placeholder="your@email.com" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="comment-content">评论内容</label>
+      <textarea id="comment-content" name="content" rows="4" required placeholder="分享你的想法..."></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">
+      <span>发表评论</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 2L11 13"></path>
+        <path d="M22 2l-7 20-4-9-9-4 20-7z"></path>
+      </svg>
+    </button>
+  </form>
+
+  <!-- 评论列表 -->
+  <div class="comments-list" id="comments-list">
+    <div class="comments-empty">
+      <span class="empty-icon">💭</span>
+      <p>暂无评论，来抢沙发吧！</p>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ postSlug }}>
+  // 评论管理
+  const STORAGE_KEY = `comments_${postSlug}`;
+  
+  // 获取评论
+  function getComments() {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  }
+  
+  // 保存评论
+  function saveComment(comment) {
+    const comments = getComments();
+    comments.unshift({
+      ...comment,
+      id: Date.now(),
+      date: new Date().toISOString(),
+      likes: 0
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(comments));
+    return comments;
+  }
+  
+  // 点赞评论
+  function likeComment(commentId) {
+    const comments = getComments();
+    const comment = comments.find(c => c.id === commentId);
+    if (comment) {
+      comment.likes++;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(comments));
+    }
+    return comments;
+  }
+  
+  // 渲染评论
+  function renderComments() {
+    const comments = getComments();
+    const listEl = document.getElementById('comments-list');
+    
+    if (comments.length === 0) {
+      listEl.innerHTML = `
+        <div class="comments-empty">
+          <span class="empty-icon">💭</span>
+          <p>暂无评论，来抢沙发吧！</p>
+        </div>
+      `;
+      return;
+    }
+    
+    listEl.innerHTML = comments.map(comment => `
+      <div class="comment-item" data-id="${comment.id}">
+        <div class="comment-header">
+          <div class="comment-author">
+            <span class="author-avatar">${comment.name.charAt(0).toUpperCase()}</span>
+            <span class="author-name">${escapeHtml(comment.name)}</span>
+          </div>
+          <time class="comment-date">${formatDate(comment.date)}</time>
+        </div>
+        <div class="comment-content">${escapeHtml(comment.content)}</div>
+        <div class="comment-actions">
+          <button class="like-btn" data-id="${comment.id}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            <span>${comment.likes || 0}</span>
+          </button>
+        </div>
+      </div>
+    `).join('');
+    
+    // 绑定点赞事件
+    listEl.querySelectorAll('.like-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = parseInt(btn.dataset.id);
+        likeComment(id);
+        renderComments();
+      });
+    });
+  }
+  
+  // 转义HTML
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  
+  // 格式化日期
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('zh-CN', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+  
+  // 表单提交
+  const form = document.getElementById('comment-form');
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(form);
+    const comment = {
+      name: formData.get('name'),
+      email: formData.get('email'),
+      content: formData.get('content')
+    };
+    
+    saveComment(comment);
+    renderComments();
+    form.reset();
+    
+    // 显示成功提示
+    showToast('评论发表成功！');
+  });
+  
+  // Toast提示
+  function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.classList.add('show');
+    }, 10);
+    
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 2000);
+  }
+  
+  // 初始化
+  renderComments();
+</script>
+
+<style>
+  .comments-section {
+    margin-top: var(--space-12);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .comments-title {
+    font-size: 1.35rem;
+    margin-bottom: var(--space-6);
+    color: var(--forest-900);
+  }
+
+  /* 评论表单 */
+  .comment-form {
+    background: var(--forest-50);
+    padding: var(--space-5);
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--space-6);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .form-group label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-text);
+  }
+
+  .form-group input,
+  .form-group textarea {
+    padding: var(--space-3);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    background: var(--color-surface);
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(74, 138, 74, 0.1);
+  }
+
+  .comment-form .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  /* 评论列表 */
+  .comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .comments-empty {
+    text-align: center;
+    padding: var(--space-8);
+    color: var(--color-text-muted);
+  }
+
+  .empty-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: var(--space-3);
+  }
+
+  .comment-item {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+  }
+
+  .comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-3);
+  }
+
+  .comment-author {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .author-avatar {
+    width: 32px;
+    height: 32px;
+    background: var(--forest-100);
+    color: var(--forest-700);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .author-name {
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .comment-date {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+  }
+
+  .comment-content {
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin-bottom: var(--space-3);
+  }
+
+  .comment-actions {
+    display: flex;
+    gap: var(--space-3);
+  }
+
+  .like-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-3);
+    background: var(--stone-100);
+    border: none;
+    border-radius: var(--radius-full);
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .like-btn:hover {
+    background: var(--forest-100);
+    color: var(--color-primary);
+  }
+
+  /* Toast */
+  :global(.toast) {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--forest-800);
+    color: white;
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--radius-full);
+    font-size: 0.95rem;
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+
+  :global(.toast.show) {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+  @media (max-width: 640px) {
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

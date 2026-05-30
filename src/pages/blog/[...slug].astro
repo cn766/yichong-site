@@ -1,0 +1,757 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Comments from '../../components/Comments.astro';
+import FavoriteButton from '../../components/FavoriteButton.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map(post => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+
+// 获取所有文章用于相关推荐
+const allPosts = await getCollection('blog');
+const relatedPosts = allPosts
+  .filter(p => p.slug !== post.slug)
+  .map(p => {
+    const sharedTags = p.data.tags.filter(t => post.data.tags.includes(t));
+    const sameCategory = p.data.category === post.data.category ? 2 : 0;
+    return { ...p, score: sharedTags.length + sameCategory };
+  })
+  .filter(p => p.score > 0)
+  .sort((a, b) => b.score - a.score)
+  .slice(0, 3);
+
+const siteUrl = 'https://yichongzhinan.com';
+const postUrl = `${siteUrl}/blog/${post.slug}`;
+const publishedDate = post.data.pubDate.toISOString();
+const modifiedDate = post.data.updatedDate ? post.data.updatedDate.toISOString() : publishedDate;
+
+// 估算字数
+const wordCount = (post.body || '').replace(/\s/g, '').length;
+const readingTime = Math.ceil(wordCount / 400); // 假设每分钟400字
+
+// Schema.org
+const baseArticle = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": post.data.title,
+  "description": post.data.description,
+  "url": postUrl,
+  "datePublished": publishedDate,
+  "dateModified": modifiedDate,
+  "inLanguage": "zh-CN",
+  "isAccessibleForFree": true,
+  "wordCount": wordCount,
+  "author": { "@type": "Person", "name": "异宠指南", "url": siteUrl },
+  "publisher": { "@type": "Organization", "name": "异宠指南", "url": siteUrl },
+  "mainEntityOfPage": { "@type": "WebPage", "@id": postUrl },
+  "about": { "@type": "Thing", "name": post.data.category },
+  ...(post.data.heroImage && { "image": { "@type": "ImageObject", "url": new URL(post.data.heroImage, siteUrl).toString() } }),
+  ...(post.data.tags.length > 0 && { "keywords": post.data.tags.join(', ') })
+};
+
+const breadcrumbList = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页", "item": siteUrl },
+    { "@type": "ListItem", "position": 2, "name": post.data.category, "item": `${siteUrl}/blog` },
+    { "@type": "ListItem", "position": 3, "name": post.data.title, "item": postUrl }
+  ]
+};
+---
+
+<Layout title={`${post.data.title} | 异宠指南`} description={post.data.description}>
+  <script type="application/ld+json" set:html={JSON.stringify(baseArticle)} />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbList)} />
+
+  <article class="blog-post">
+    <!-- Hero Header -->
+    <header class="post-hero">
+      <div class="hero-bg">
+        <div class="hero-pattern"></div>
+      </div>
+      <div class="container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" aria-label="面包屑导航">
+          <a href="/">首页</a>
+          <span class="separator">/</span>
+          <a href="/blog.html">{post.data.category}</a>
+          <span class="separator">/</span>
+          <span class="current">{post.data.title}</span>
+        </nav>
+
+        <!-- Category & Tags -->
+        <div class="post-tags">
+          <span class="post-category">{post.data.category}</span>
+          {post.data.tags.slice(0, 3).map(tag => (
+            <span class="post-tag">{tag}</span>
+          ))}
+        </div>
+
+        <!-- Title -->
+        <h1 class="post-title">{post.data.title}</h1>
+        <p class="post-desc">{post.data.description}</p>
+
+        <!-- Meta -->
+        <div class="post-meta">
+          <div class="meta-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect width="18" height="18" x="3" y="4" rx="2" ry="2"></rect>
+              <line x1="16" x2="16" y1="2" y2="6"></line>
+              <line x1="8" x2="8" y1="2" y2="6"></line>
+              <line x1="3" x2="21" y1="10" y2="10"></line>
+            </svg>
+            <time datetime={post.data.pubDate.toISOString()}>
+              {post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}
+            </time>
+          </div>
+          <div class="meta-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>{readingTime} 分钟阅读</span>
+          </div>
+          {post.data.updatedDate && (
+            <div class="meta-item updated">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <path d="M3 3v5h5"></path>
+                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+                <path d="M16 16h5v5"></path>
+              </svg>
+              <span>更新于 {post.data.updatedDate.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })}</span>
+            </div>
+          )}
+        </div>
+
+        <!-- Actions -->
+        <div class="post-actions">
+          <FavoriteButton postSlug={post.slug} postTitle={post.data.title} />
+          <a href="#comments" class="btn btn-ghost">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>评论</span>
+          </a>
+          <button class="btn btn-ghost" id="share-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="18" cy="5" r="3"></circle>
+              <circle cx="6" cy="12" r="3"></circle>
+              <circle cx="18" cy="19" r="3"></circle>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+            </svg>
+            <span>分享</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Featured Image -->
+    {post.data.heroImage && (
+      <div class="post-image">
+        <div class="container">
+          <img src={post.data.heroImage} alt={post.data.title} loading="eager" />
+        </div>
+      </div>
+    )}
+
+    <!-- Content -->
+    <div class="post-content-wrapper">
+      <div class="container">
+        <div class="post-layout">
+          <!-- Main Content -->
+          <div class="post-content">
+            <Content />
+          </div>
+
+          <!-- Sidebar -->
+          <aside class="post-sidebar">
+            <div class="sidebar-card">
+              <h4>📖 目录</h4>
+              <nav class="toc" id="toc">
+                <p class="toc-placeholder">加载中...</p>
+              </nav>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Posts -->
+    {relatedPosts.length > 0 && (
+      <section class="related-section">
+        <div class="container">
+          <h2 class="related-title">相关阅读</h2>
+          <div class="related-grid">
+            {relatedPosts.map(rp => (
+              <a href={`/blog/${rp.slug}.html`} class="related-card">
+                {rp.data.heroImage && (
+                  <div class="related-image">
+                    <img src={rp.data.heroImage} alt={rp.data.title} loading="lazy" />
+                  </div>
+                )}
+                <div class="related-content">
+                  <span class="related-category">{rp.data.category}</span>
+                  <h3>{rp.data.title}</h3>
+                  <p>{rp.data.description}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- Comments -->
+    <section id="comments" class="comments-wrapper">
+      <div class="container">
+        <Comments postSlug={post.slug} />
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <nav class="post-navigation">
+      <div class="container">
+        <a href="/blog.html" class="nav-back">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m15 18-6-6 6-6"/>
+          </svg>
+          返回文章列表
+        </a>
+      </div>
+    </nav>
+  </article>
+</Layout>
+
+<script>
+  // 生成目录
+  document.addEventListener('DOMContentLoaded', () => {
+    const headings = document.querySelectorAll('.post-content h2, .post-content h3');
+    const toc = document.getElementById('toc');
+    
+    if (headings.length > 0 && toc) {
+      const ul = document.createElement('ul');
+      ul.className = 'toc-list';
+      
+      headings.forEach((heading, index) => {
+        const id = `heading-${index}`;
+        heading.id = id;
+        
+        const li = document.createElement('li');
+        li.className = heading.tagName === 'H3' ? 'toc-subitem' : 'toc-item';
+        
+        const a = document.createElement('a');
+        a.href = `#${id}`;
+        a.textContent = heading.textContent || '';
+        
+        li.appendChild(a);
+        ul.appendChild(li);
+      });
+      
+      toc.innerHTML = '';
+      toc.appendChild(ul);
+    } else if (toc) {
+      toc.innerHTML = '<p class="toc-empty">本文无目录结构</p>';
+    }
+  });
+
+  // 阅读进度
+  const progressBar = document.createElement('div');
+  progressBar.className = 'reading-progress';
+  document.body.appendChild(progressBar);
+  
+  window.addEventListener('scroll', () => {
+    const scrollTop = document.documentElement.scrollTop;
+    const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = (scrollTop / scrollHeight) * 100;
+    progressBar.style.width = `${progress}%`;
+  });
+
+  // 分享功能
+  const shareBtn = document.getElementById('share-btn');
+  shareBtn?.addEventListener('click', async () => {
+    const shareData = {
+      title: document.title,
+      url: window.location.href
+    };
+    
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        console.log('分享取消');
+      }
+    } else {
+      // 复制链接
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        showToast('链接已复制到剪贴板');
+      } catch (err) {
+        // 降级方案
+        const input = document.createElement('input');
+        input.value = window.location.href;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        showToast('链接已复制到剪贴板');
+      }
+    }
+  });
+
+  // Toast提示
+  function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 2000);
+  }
+</script>
+
+<style>
+  /* Hero */
+  .post-hero {
+    position: relative;
+    padding: var(--space-10) 0 var(--space-12);
+    background: linear-gradient(135deg, var(--forest-50) 0%, var(--earth-50) 100%);
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .hero-pattern {
+    position: absolute;
+    inset: 0;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  .container {
+    max-width: var(--max-width-xl);
+    margin: 0 auto;
+    padding: 0 var(--space-5);
+  }
+
+  /* Breadcrumb */
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.9rem;
+    margin-bottom: var(--space-5);
+    flex-wrap: wrap;
+  }
+
+  .breadcrumb a {
+    color: var(--color-text-secondary);
+  }
+
+  .breadcrumb a:hover {
+    color: var(--color-primary);
+  }
+
+  .breadcrumb .separator {
+    color: var(--color-text-muted);
+  }
+
+  .breadcrumb .current {
+    color: var(--color-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 200px;
+  }
+
+  /* Tags */
+  .post-tags {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-4);
+  }
+
+  .post-category {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    background: var(--forest-600);
+    color: white;
+    border-radius: var(--radius-full);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .post-tag {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    background: var(--forest-100);
+    color: var(--forest-700);
+    border-radius: var(--radius-full);
+    font-size: 0.8rem;
+  }
+
+  /* Title */
+  .post-title {
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: var(--space-4);
+    color: var(--forest-900);
+  }
+
+  .post-desc {
+    font-size: 1.15rem;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    max-width: 700px;
+    margin-bottom: var(--space-6);
+  }
+
+  /* Meta */
+  .post-meta {
+    display: flex;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+  }
+
+  .meta-item svg {
+    color: var(--color-text-muted);
+  }
+
+  .meta-item.updated {
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+  }
+
+  /* Featured Image */
+  .post-image {
+    margin-top: calc(-1 * var(--space-8));
+    margin-bottom: var(--space-10);
+  }
+
+  .post-image img {
+    width: 100%;
+    max-height: 500px;
+    object-fit: cover;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+  }
+
+  /* Content Layout */
+  .post-content-wrapper {
+    padding-bottom: var(--space-12);
+  }
+
+  .post-layout {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: var(--space-10);
+  }
+
+  /* Post Content */
+  .post-content {
+    font-size: 1.05rem;
+    line-height: 1.9;
+    color: var(--color-text);
+  }
+
+  .post-content :global(h2) {
+    font-size: 1.6rem;
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: 2px solid var(--forest-100);
+    color: var(--forest-900);
+  }
+
+  .post-content :global(h3) {
+    font-size: 1.25rem;
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+    color: var(--forest-800);
+  }
+
+  .post-content :global(p) {
+    margin-bottom: var(--space-4);
+  }
+
+  .post-content :global(ul),
+  .post-content :global(ol) {
+    margin-bottom: var(--space-4);
+    padding-left: var(--space-6);
+  }
+
+  .post-content :global(li) {
+    margin-bottom: var(--space-2);
+  }
+
+  .post-content :global(blockquote) {
+    border-left: 4px solid var(--forest-500);
+    padding: var(--space-4) var(--space-6);
+    margin: var(--space-6) 0;
+    background: linear-gradient(135deg, var(--forest-50) 0%, var(--earth-50) 100%);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    color: var(--forest-800);
+    font-style: italic;
+  }
+
+  .post-content :global(pre) {
+    background: var(--stone-800);
+    color: var(--stone-100);
+    padding: var(--space-5);
+    border-radius: var(--radius-lg);
+    overflow-x: auto;
+    margin: var(--space-6) 0;
+  }
+
+  .post-content :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--space-6) 0;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+  }
+
+  .post-content :global(th),
+  .post-content :global(td) {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .post-content :global(th) {
+    background: var(--forest-50);
+    font-weight: 600;
+    color: var(--forest-800);
+  }
+
+  /* Sidebar */
+  .post-sidebar {
+    position: sticky;
+    top: calc(var(--header-height) + var(--space-5));
+    height: fit-content;
+  }
+
+  .sidebar-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-5);
+  }
+
+  .sidebar-card h4 {
+    font-size: 1rem;
+    margin-bottom: var(--space-4);
+    color: var(--color-text);
+  }
+
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .toc-item {
+    margin-bottom: var(--space-2);
+  }
+
+  .toc-subitem {
+    margin-bottom: var(--space-1);
+    padding-left: var(--space-4);
+    font-size: 0.9rem;
+  }
+
+  .toc a {
+    display: block;
+    padding: var(--space-2);
+    color: var(--color-text-secondary);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    transition: all var(--transition-fast);
+  }
+
+  .toc a:hover {
+    background: var(--forest-50);
+    color: var(--color-primary);
+  }
+
+  .toc-empty {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+  }
+
+  .toc-placeholder {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+  }
+
+  /* Related Section */
+  .related-section {
+    background: var(--forest-50);
+    padding: var(--space-12) 0;
+  }
+
+  .related-title {
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: var(--space-8);
+    color: var(--forest-900);
+  }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-5);
+  }
+
+  .related-card {
+    background: var(--color-surface);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    transition: all var(--transition-base);
+  }
+
+  .related-card:hover {
+    border-color: var(--forest-300);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+  }
+
+  .related-image {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+  }
+
+  .related-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s;
+  }
+
+  .related-card:hover .related-image img {
+    transform: scale(1.05);
+  }
+
+  .related-content {
+    padding: var(--space-4);
+  }
+
+  .related-category {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-transform: uppercase;
+  }
+
+  .related-content h3 {
+    font-size: 1rem;
+    margin: var(--space-2) 0;
+    color: var(--color-text);
+  }
+
+  .related-content p {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin: 0;
+  }
+
+  /* Navigation */
+  .post-navigation {
+    padding: var(--space-6) 0;
+    border-top: 1px solid var(--color-border-light);
+  }
+
+  .nav-back {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    transition: color var(--transition-fast);
+  }
+
+  .nav-back:hover {
+    color: var(--color-primary);
+  }
+
+  /* Reading Progress */
+  :global(.reading-progress) {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--forest-500), var(--color-accent));
+    z-index: 1000;
+    transition: width 0.1s;
+  }
+
+  /* Responsive */
+  @media (max-width: 968px) {
+    .post-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .post-sidebar {
+      position: static;
+      display: none;
+    }
+
+    .related-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .post-hero {
+      padding: var(--space-6) 0 var(--space-8);
+    }
+
+    .post-image {
+      margin-top: 0;
+    }
+
+    .post-meta {
+      gap: var(--space-4);
+    }
+
+    .breadcrumb .current {
+      max-width: 120px;
+    }
+  }
+</style>

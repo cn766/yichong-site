@@ -1,0 +1,305 @@
+---
+// 物种数据对比图表组件
+---
+
+<div class="species-chart-section">
+  <div class="chart-header">
+    <h3>📊 物种数据对比</h3>
+    <p>直观对比不同物种的饲养参数</p>
+  </div>
+  
+  <div class="chart-controls">
+    <label class="chart-label">选择对比维度：</label>
+    <div class="chart-tabs">
+      <button class="chart-tab active" data-metric="difficulty">饲养难度</button>
+      <button class="chart-tab" data-metric="lifespan">寿命</button>
+      <button class="chart-tab" data-metric="size">体型</button>
+      <button class="chart-tab" data-metric="cost">饲养成本</button>
+    </div>
+  </div>
+
+  <div class="chart-container">
+    <canvas id="speciesChart"></canvas>
+  </div>
+
+  <div class="chart-legend" id="chartLegend">
+    <!-- 动态生成 -->
+  </div>
+</div>
+
+<script>
+  // 物种数据
+  const speciesData = [
+    { name: '豹纹守宫', difficulty: 1, lifespan: 15, size: 22, cost: 2, color: '#F5A623', category: '守宫' },
+    { name: '睫角守宫', difficulty: 2, lifespan: 18, size: 20, cost: 3, color: '#E8734A', category: '守宫' },
+    { name: '肥尾守宫', difficulty: 2, lifespan: 18, size: 24, cost: 3, color: '#7C5C3C', category: '守宫' },
+    { name: '瘤尾守宫', difficulty: 3, lifespan: 10, size: 12, cost: 4, color: '#D4A574', category: '守宫' },
+    { name: '巨人守宫', difficulty: 4, lifespan: 25, size: 35, cost: 5, color: '#4A6741', category: '守宫' },
+    { name: '玉米蛇', difficulty: 1, lifespan: 18, size: 120, cost: 2, color: '#E85D3A', category: '蛇类' },
+    { name: '球蟒', difficulty: 2, lifespan: 25, size: 120, cost: 3, color: '#B8860B', category: '蛇类' },
+    { name: '王蛇', difficulty: 3, lifespan: 20, size: 135, cost: 3, color: '#FF6347', category: '蛇类' },
+    { name: '鬃狮蜥', difficulty: 2, lifespan: 10, size: 52, cost: 3, color: '#D2691E', category: '蜥蜴' },
+    { name: '蓝舌石龙子', difficulty: 2, lifespan: 18, size: 52, cost: 3, color: '#4169E1', category: '蜥蜴' },
+    { name: '绿鬣蜥', difficulty: 4, lifespan: 18, size: 150, cost: 4, color: '#228B22', category: '蜥蜴' },
+    { name: '角蛙', difficulty: 1, lifespan: 8, size: 12, cost: 1, color: '#9ACD32', category: '蛙类' },
+    { name: '老爷树蛙', difficulty: 2, lifespan: 13, size: 9, cost: 2, color: '#3CB371', category: '蛙类' },
+    { name: '番茄蛙', difficulty: 3, lifespan: 7, size: 8, cost: 3, color: '#FF4500', category: '蛙类' },
+    { name: '赫曼陆龟', difficulty: 2, lifespan: 60, size: 22, cost: 3, color: '#8B7355', category: '龟类' },
+    { name: '红腿陆龟', difficulty: 3, lifespan: 65, size: 35, cost: 4, color: '#CD5C5C', category: '龟类' },
+  ];
+
+  // 图表配置
+  const metricConfig = {
+    difficulty: { label: '饲养难度', max: 5, unit: '星', colors: ['#22c55e', '#84cc16', '#eab308', '#f97316', '#ef4444'] },
+    lifespan: { label: '寿命', max: 70, unit: '年', colors: ['#3b82f6'] },
+    size: { label: '体长', max: 160, unit: 'cm', colors: ['#8b5cf6'] },
+    cost: { label: '饲养成本', max: 5, unit: '级', colors: ['#f59e0b'] }
+  };
+
+  let currentMetric = 'difficulty';
+  let chart = null;
+
+  // 初始化图表
+  function initChart() {
+    const canvas = document.getElementById('speciesChart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const container = canvas.parentElement;
+    
+    // 设置canvas尺寸
+    const dpr = window.devicePixelRatio || 1;
+    const rect = container.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = 400 * dpr;
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = '400px';
+    ctx.scale(dpr, dpr);
+
+    drawChart(ctx, rect.width, 400);
+    updateLegend();
+  }
+
+  // 绘制图表
+  function drawChart(ctx, width, height) {
+    const config = metricConfig[currentMetric];
+    const data = speciesData.sort((a, b) => b[currentMetric] - a[currentMetric]).slice(0, 10);
+    
+    const padding = { top: 40, right: 20, bottom: 80, left: 60 };
+    const chartWidth = width - padding.left - padding.right;
+    const chartHeight = height - padding.top - padding.bottom;
+    
+    // 清空画布
+    ctx.clearRect(0, 0, width, height);
+    
+    // 绘制标题
+    ctx.font = 'bold 16px sans-serif';
+    ctx.fillStyle = '#1f2937';
+    ctx.textAlign = 'center';
+    ctx.fillText(config.label + '对比', width / 2, 25);
+    
+    // 绘制Y轴
+    ctx.strokeStyle = '#e5e7eb';
+    ctx.lineWidth = 1;
+    
+    for (let i = 0; i <= 5; i++) {
+      const y = padding.top + chartHeight - (i / 5) * chartHeight;
+      ctx.beginPath();
+      ctx.moveTo(padding.left, y);
+      ctx.lineTo(width - padding.right, y);
+      ctx.stroke();
+      
+      // Y轴标签
+      ctx.font = '12px sans-serif';
+      ctx.fillStyle = '#6b7280';
+      ctx.textAlign = 'right';
+      const value = Math.round((config.max / 5) * i);
+      ctx.fillText(value + config.unit, padding.left - 10, y + 4);
+    }
+    
+    // 绘制柱状图
+    const barWidth = chartWidth / data.length * 0.7;
+    const barGap = chartWidth / data.length * 0.3;
+    
+    data.forEach((item, index) => {
+      const x = padding.left + index * (barWidth + barGap) + barGap / 2;
+      const barHeight = (item[currentMetric] / config.max) * chartHeight;
+      const y = padding.top + chartHeight - barHeight;
+      
+      // 绘制柱子
+      const gradient = ctx.createLinearGradient(0, y, 0, y + barHeight);
+      gradient.addColorStop(0, item.color);
+      gradient.addColorStop(1, item.color + '80');
+      
+      ctx.fillStyle = gradient;
+      ctx.fillRect(x, y, barWidth, barHeight);
+      
+      // 绘制数值
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillStyle = '#1f2937';
+      ctx.textAlign = 'center';
+      ctx.fillText(item[currentMetric] + config.unit, x + barWidth / 2, y - 8);
+      
+      // 绘制名称（旋转）
+      ctx.save();
+      ctx.translate(x + barWidth / 2, padding.top + chartHeight + 15);
+      ctx.rotate(-Math.PI / 4);
+      ctx.font = '11px sans-serif';
+      ctx.fillStyle = '#4b5563';
+      ctx.textAlign = 'right';
+      ctx.fillText(item.name, 0, 0);
+      ctx.restore();
+    });
+  }
+
+  // 更新图例
+  function updateLegend() {
+    const legend = document.getElementById('chartLegend');
+    const categories = [...new Set(speciesData.map(s => s.category))];
+    
+    legend.innerHTML = categories.map(cat => {
+      const species = speciesData.filter(s => s.category === cat);
+      const color = species[0].color;
+      return `
+        <div class="legend-item">
+          <span class="legend-color" style="background: ${color}"></span>
+          <span class="legend-label">${cat}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // 切换指标
+  document.querySelectorAll('.chart-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentMetric = tab.dataset.metric;
+      initChart();
+    });
+  });
+
+  // 响应式重绘
+  window.addEventListener('resize', () => {
+    initChart();
+  });
+
+  // 初始化
+  document.addEventListener('DOMContentLoaded', initChart);
+</script>
+
+<style>
+  .species-chart-section {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    margin: var(--space-8) 0;
+  }
+
+  .chart-header {
+    text-align: center;
+    margin-bottom: var(--space-5);
+  }
+
+  .chart-header h3 {
+    font-size: 1.25rem;
+    margin-bottom: var(--space-2);
+    color: var(--forest-900);
+  }
+
+  .chart-header p {
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+  }
+
+  .chart-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
+    flex-wrap: wrap;
+  }
+
+  .chart-label {
+    font-weight: 500;
+    color: var(--color-text);
+  }
+
+  .chart-tabs {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .chart-tab {
+    padding: var(--space-2) var(--space-4);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-full);
+    background: var(--color-surface);
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .chart-tab:hover {
+    border-color: var(--forest-300);
+    background: var(--forest-50);
+  }
+
+  .chart-tab.active {
+    background: var(--forest-600);
+    color: white;
+    border-color: var(--forest-600);
+  }
+
+  .chart-container {
+    width: 100%;
+    height: 400px;
+    margin-bottom: var(--space-4);
+  }
+
+  #speciesChart {
+    width: 100%;
+    height: 100%;
+  }
+
+  .chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: var(--radius-sm);
+  }
+
+  .legend-label {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+  }
+
+  @media (max-width: 640px) {
+    .chart-controls {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .chart-tabs {
+      flex-wrap: wrap;
+    }
+
+    .chart-container {
+      height: 300px;
+    }
+  }
+</style>
