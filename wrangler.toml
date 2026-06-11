@@ -1,0 +1,5 @@
+name = "yi-chong-guide"
+pages_build_output_dir = "dist"
+
+[vars]
+PUBLIC_SITE_URL = "https://yi-chong-guide.pages.dev"

@@ -1,5 +1,8 @@
 node_modules/
 dist/
+dist-clean/
 .astro/
 .cache/
 .DS_Store
+
+.vercel

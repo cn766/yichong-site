@@ -2,7 +2,7 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://yichongzhinan.com',
+  site: process.env.PUBLIC_SITE_URL || 'https://yi-chong-guide.pages.dev',
   integrations: [sitemap()],
   build: {
     format: 'file',
