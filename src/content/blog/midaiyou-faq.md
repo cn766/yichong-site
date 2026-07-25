@@ -3,7 +3,7 @@ title: "蜜袋鼯常见问题解答：合法吗？吃什么？怎么训练？"
 description: "蜜袋鼯饲养最常被问到的15个问题，涵盖合法性、饮食、bonding训练、寿命、花销等新手最关心的话题。"
 pubDate: 2025-05-28
 updatedDate: 2025-05-28
-heroImage: "/images/midaiyou-faq.jpg"
+heroImage: "/images/midaiyou-faq.webp"
 category: "哺乳类"
 tags: ["蜜袋鼯", "蜜袋鼯FAQ", "蜜袋鼯合法吗", "蜜袋鼯价格", "异宠"]
 author: "异宠指南编辑部"

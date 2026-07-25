@@ -4,7 +4,7 @@ description: "饲料虫是异宠饲养的持续成本。本文详解杜比亚蟑
 pubDate: 2026-05-27
 category: "饲养管理"
 tags: ["饲料虫", "杜比亚蟑螂", "蟋蟀", "面包虫", "饲养繁殖"]
-heroImage: "/images/siliao-chong.jpg"
+heroImage: "/images/siliao-chong.webp"
 schemaType: HowTo
 howToSteps:
   - name: 选择适合的饲料虫品种

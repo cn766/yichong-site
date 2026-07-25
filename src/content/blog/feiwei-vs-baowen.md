@@ -3,7 +3,7 @@ title: "肥尾守宫 vs 豹纹守宫：到底选哪个？2025年终极对比"
 description: "肥尾守宫和豹纹守宫长得很像，但性格、饲养难度、价格差异明显。基于同时饲养两种守宫的真实经验，10维度全方位对比。"
 pubDate: 2025-05-28
 updatedDate: 2025-05-28
-heroImage: "/images/feiwei-vs-baowen.jpg"
+heroImage: "/images/feiwei-vs-baowen.webp"
 category: "守宫"
 tags: ["肥尾守宫", "豹纹守宫", "守宫对比", "爬宠", "宠物蜥蜴"]
 author: "异宠指南编辑部"

@@ -3,7 +3,7 @@ title: "猪鼻蛇 vs 玉米蛇：2025年最值得养的新手蛇，到底选哪�
 description: "猪鼻蛇和玉米蛇都是最适合新手的宠物蛇，但它们在性格、饲养难度、价格、互动性上差异很大。本文基于真实饲养经验，从10个维度帮你做出选择。"
 pubDate: 2025-05-28
 updatedDate: 2025-05-28
-heroImage: "/images/zhubishe-vs-yumishe.jpg"
+heroImage: "/images/zhubishe-vs-yumishe.webp"
 category: "蛇类"
 tags: ["猪鼻蛇", "玉米蛇", "宠物蛇对比", "新手蛇推荐", "爬宠"]
 author: "异宠指南编辑部"

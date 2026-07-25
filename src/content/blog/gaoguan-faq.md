@@ -3,7 +3,7 @@ title: "高冠变色龙常见问题：真的很难养吗？需要什么设备？
 description: "高冠变色龙最常被问到的15个问题，涵盖饲养难度、设备需求、喂食、变色原理等。"
 pubDate: 2025-05-28
 updatedDate: 2025-05-28
-heroImage: "/images/gaoguan-faq.jpg"
+heroImage: "/images/gaoguan-faq.webp"
 category: "蜥蜴"
 tags: ["高冠变色龙", "变色龙FAQ", "变色龙饲养", "爬宠", "蜥蜴"]
 author: "异宠指南编辑部"

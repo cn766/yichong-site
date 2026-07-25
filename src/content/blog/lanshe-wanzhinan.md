@@ -3,7 +3,7 @@ title: "蓝舌石龙子完全指南：吐舌卖萌的移动表情包（2025版�
 description: "蓝舌石龙子饲养完全指南，覆盖品种选择（印尼/澳洲/北部/伊利安亚种）、饲养环境搭建、温湿度控制、喂食方案、健康管理与疾病防治。基于真实饲养经验。"
 pubDate: 2025-05-28
 updatedDate: 2025-05-28
-heroImage: "/images/lanshe-hero.jpg"
+heroImage: "/images/lanshe-hero.webp"
 category: "蜥蜴"
 tags: ["蓝舌石龙子", "蓝舌蜥", "宠物蜥蜴", "爬宠", "新手入门"]
 author: "异宠指南编辑部"

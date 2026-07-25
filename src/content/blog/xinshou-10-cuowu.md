@@ -4,7 +4,7 @@ description: "养异宠的路上，新手最容易踩的10个坑。本文用真�
 pubDate: 2026-05-27
 category: "新手指南"
 tags: ["新手错误", "异宠避坑", "饲养误区", "真实案例"]
-heroImage: "/images/xinshou-10-cuowu.jpg"
+heroImage: "/images/xinshou-10-cuowu.webp"
 schemaType: FAQ
 faqItems:
   - question: 为什么不能买野生捕获（WC）的异宠个体？

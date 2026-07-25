@@ -2,7 +2,7 @@
 title: "鬃狮蜥品种图鉴：从普通到果冻，10大品系全解析"
 description: "详解鬃狮蜥10大热门品系：普通、果冻、皮革、丝绒、白化、零式等，含基因遗传方式、价格区间和选购建议。"
 pubDate: 2026-05-27
-heroImage: "/images/zongshilv-pinzhong.jpg"
+heroImage: "/images/zongshilv-pinzhong.webp"
 category: "品种鉴赏"
 tags: ["鬃狮蜥", "品种", "基因", "果冻", "皮革", "选购指南"]
 ---

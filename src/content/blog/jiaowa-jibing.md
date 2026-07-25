@@ -2,7 +2,7 @@
 title: "角蛙常见疾病识别与处理：红腿病、肠道堵塞、气肿症"
 description: "覆盖角蛙6大常见疾病：红腿病、肠道堵塞、气肿症、真菌感染、维生素缺乏、脱水。家庭处理方案与就医判断标准。"
 pubDate: 2026-05-27
-heroImage: "/images/jiaowa-jibing.jpg"
+heroImage: "/images/jiaowa-jibing.webp"
 category: "疾病处理"
 tags: ["角蛙", "疾病", "红腿病", "肠道堵塞", "气肿症", "两栖动物医疗"]
 schemaType: FAQ

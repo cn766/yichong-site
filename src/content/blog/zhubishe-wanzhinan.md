@@ -3,7 +3,7 @@ title: "猪鼻蛇完全指南：从零开始的饲养百科（2025版）"
 description: "猪鼻蛇饲养完全指南，覆盖品种选择、饲养环境搭建、温湿度控制、喂食方案、健康管理与疾病防治、繁殖知识等全部内容。基于真实饲养经验，5000+字深度长文。"
 pubDate: 2025-05-28
 updatedDate: 2025-05-28
-heroImage: "/images/zhubishe-hero.jpg"
+heroImage: "/images/zhubishe-hero.webp"
 category: "蛇类"
 tags: ["猪鼻蛇", "宠物蛇", "爬宠", "蛇类饲养", "新手入门"]
 author: "异宠指南编辑部"

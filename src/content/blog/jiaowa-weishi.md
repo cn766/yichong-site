@@ -2,7 +2,7 @@
 title: "角蛙喂食完全指南：从开口到成体，多久喂一次、喂什么、喂多少"
 description: "详解角蛙全生命周期喂食方案：饵料选择、喂食频率、食物尺寸、钙粉补充、拒食处理。覆盖幼体到成体的完整喂养策略。"
 pubDate: 2026-05-27
-heroImage: "/images/jiaowa-weishi.jpg"
+heroImage: "/images/jiaowa-weishi.webp"
 category: "饲养管理"
 tags: ["角蛙", "喂食", "饵料", "钙粉", "拒食", "频率"]
 ---

@@ -2,7 +2,7 @@
 title: "鬃狮蜥常见疾病识别与处理：从MBD到呼吸道感染"
 description: "覆盖鬃狮蜥7大常见疾病：代谢性骨病(MBD)、呼吸道感染、寄生虫、便秘/肠梗、脓疡、尾部坏死、脱水。识别方法与处理方案。"
 pubDate: 2026-05-27
-heroImage: "/images/zongshilv-jibing.jpg"
+heroImage: "/images/zongshilv-jibing.webp"
 category: "疾病处理"
 tags: ["鬃狮蜥", "疾病", "代谢性骨病", "MBD", "呼吸道感染", "异宠医疗"]
 ---

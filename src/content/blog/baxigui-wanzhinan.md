@@ -3,7 +3,7 @@ title: "巴西龟完全指南：最常见的水龟饲养百科（2025版）"
 description: "巴西龟饲养完全指南，覆盖变异品种、水缸搭建、过滤系统、喂食方案、冬眠管理、常见疾病等。巴西龟是最普及的宠物龟，但养好它需要正确的知识。"
 pubDate: 2025-05-28
 updatedDate: 2025-05-28
-heroImage: "/images/baxigui-hero.jpg"
+heroImage: "/images/baxigui-hero.webp"
 category: "龟类"
 tags: ["巴西龟", "宠物龟", "水龟", "异宠", "新手入门"]
 author: "异宠指南编辑部"

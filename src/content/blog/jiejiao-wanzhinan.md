@@ -3,7 +3,7 @@ title: "睫角守宫完全指南：活体手办的饲养百科（2025版）"
 description: "睫角守宫饲养完全指南，覆盖品种选择、雨林缸搭建、果泥食谱、温湿度管理、健康护理等。睫角守宫搜索量同比+180%，是爬宠圈增长最快的物种。"
 pubDate: 2025-05-28
 updatedDate: 2025-05-28
-heroImage: "/images/jiejiao-hero.jpg"
+heroImage: "/images/jiejiao-hero.webp"
 category: "守宫"
 tags: ["睫角守宫", "守宫", "爬宠", "宠物蜥蜴", "果泥饲养"]
 author: "异宠指南编辑部"

@@ -3,7 +3,7 @@ title: "睫角守宫常见问题：真的不用喂虫子吗？果泥怎么选？
 description: "睫角守宫最常被问到的15个问题，涵盖果泥饲养、品种选择、雨林缸搭建、温湿度等。"
 pubDate: 2025-05-28
 updatedDate: 2025-05-28
-heroImage: "/images/jiejiao-faq.jpg"
+heroImage: "/images/jiejiao-faq.webp"
 category: "守宫"
 tags: ["睫角守宫", "睫角守宫FAQ", "果泥饲养", "爬宠", "守宫"]
 author: "异宠指南编辑部"

@@ -3,7 +3,7 @@ title: "加州王蛇常见问题：真的免疫蛇毒吗？好养吗？多少钱
 description: "加州王蛇最常被问到的15个问题，涵盖蛇毒免疫、饲养难度、品种选择、价格等。"
 pubDate: 2025-05-28
 updatedDate: 2025-05-28
-heroImage: "/images/jiawangshe-faq.jpg"
+heroImage: "/images/jiawangshe-faq.webp"
 category: "蛇类"
 tags: ["加州王蛇", "王蛇FAQ", "加州王蛇价格", "宠物蛇", "爬宠"]
 author: "异宠指南编辑部"

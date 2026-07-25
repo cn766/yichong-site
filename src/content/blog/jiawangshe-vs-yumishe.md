@@ -3,7 +3,7 @@ title: "加州王蛇 vs 玉米蛇：新手蛇的终极对决"
 description: "加州王蛇和玉米蛇都是新手蛇的顶级选择，但它们在性格、饲养难度、外观上差异明显。基于真实饲养经验的全方位对比。"
 pubDate: 2025-05-28
 updatedDate: 2025-05-28
-heroImage: "/images/jiawangshe-vs-yumishe.jpg"
+heroImage: "/images/jiawangshe-vs-yumishe.webp"
 category: "蛇类"
 tags: ["加州王蛇", "玉米蛇", "宠物蛇对比", "新手蛇", "爬宠"]
 author: "异宠指南编辑部"

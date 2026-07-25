@@ -2,7 +2,7 @@
 title: "玉米蛇喂食完全指南：从乳鼠到成鼠，科学喂养全流程"
 description: "详解玉米蛇全生命周期喂食方案：冻鼠vs活鼠、喂食频率、食物尺寸选择、拒食处理、营养补充。新手喂食避坑必读。"
 pubDate: 2026-05-27
-heroImage: "/images/yumishe-weishi.jpg"
+heroImage: "/images/yumishe-weishi.webp"
 category: "饲养管理"
 tags: ["玉米蛇", "喂食", "冻鼠", "喂养方案", "拒食处理"]
 ---

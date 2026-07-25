@@ -3,7 +3,7 @@ title: "肥尾守宫常见问题：和豹纹守宫哪个好？怎么区分？"
 description: "肥尾守宫最常被问到的15个问题，涵盖与豹纹守宫的区别、饲养难度、品种选择、价格等。"
 pubDate: 2025-05-28
 updatedDate: 2025-05-28
-heroImage: "/images/feiwei-faq.jpg"
+heroImage: "/images/feiwei-faq.webp"
 category: "守宫"
 tags: ["肥尾守宫", "守宫FAQ", "肥尾守宫价格", "爬宠", "守宫"]
 author: "异宠指南编辑部"

@@ -3,7 +3,7 @@ title: "豹纹守宫完全指南：新手入门到进阶饲养百科（2025版�
 description: "豹纹守宫饲养完全指南，覆盖200+品系选择、饲养环境搭建、温控方案、喂食与补钙、蜕皮护理、疾病防治等。豹纹守宫是爬宠界销量TOP1，本文基于真实饲养经验。"
 pubDate: 2025-05-28
 updatedDate: 2025-05-28
-heroImage: "/images/baowen-hero.jpg"
+heroImage: "/images/baowen-hero.webp"
 category: "守宫"
 tags: ["豹纹守宫", "守宫", "爬宠", "宠物蜥蜴", "新手入门"]
 author: "异宠指南编辑部"

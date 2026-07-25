@@ -4,7 +4,7 @@ description: "鬃狮蜥（Bearded Dragon）是最适合新手的蜥蜴宠物。�
 pubDate: 2026-05-27
 category: "新手指南"
 tags: ["鬃狮蜥", "蜥蜴", "宠物蜥蜴", "新手指南"]
-heroImage: "/images/zongshilv-hero.jpg"
+heroImage: "/images/zongshilv-hero.webp"
 schemaType: HowTo
 howToSteps:
   - name: 认识鬃狮蜥的特性

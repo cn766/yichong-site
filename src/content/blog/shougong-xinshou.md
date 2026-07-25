@@ -2,7 +2,7 @@
 title: 守宫新手入门指南——从零开始养好你的第一只守宫
 description: 新手养守宫最全攻略，覆盖豹纹守宫、睫角守宫、肥尾守宫的品种选择、环境搭建、喂食方案、日常护理和常见疾病。不需要任何养宠经验，看完就能上手。
 pubDate: 2026-05-26
-heroImage: "/images/baowen-hero.jpg"
+heroImage: "/images/baowen-hero.webp"
 category: 守宫
 tags:
   - 新手入门

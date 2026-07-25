@@ -3,7 +3,7 @@ title: "蜜袋鼯 vs 龙猫 vs 刺猬：哺乳类异宠怎么选？"
 description: "蜜袋鼯、龙猫、刺猬是三大热门哺乳类异宠，但它们在性格、饲养难度、花销、互动性上差异很大。基于真实饲养经验的全方位对比。"
 pubDate: 2025-05-28
 updatedDate: 2025-05-28
-heroImage: "/images/midaiyou-vs-longmao.jpg"
+heroImage: "/images/midaiyou-vs-longmao.webp"
 category: "哺乳类"
 tags: ["蜜袋鼯", "龙猫", "刺猬", "异宠对比", "哺乳类宠物"]
 author: "异宠指南编辑部"

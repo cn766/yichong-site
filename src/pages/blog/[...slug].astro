@@ -28,7 +28,7 @@ const relatedPosts = allPosts
   .sort((a, b) => b.score - a.score)
   .slice(0, 3);
 
-const siteUrl = 'https://yichongzhinan.com';
+const siteUrl = 'https://yi-chong-guide.pages.dev';
 const postUrl = `${siteUrl}/blog/${post.slug}`;
 const publishedDate = post.data.pubDate.toISOString();
 const modifiedDate = post.data.updatedDate ? post.data.updatedDate.toISOString() : publishedDate;

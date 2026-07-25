@@ -19,7 +19,7 @@ const {
   noindex = false
 } = Astro.props;
 
-const siteUrl = 'https://yichongzhinan.com';
+const siteUrl = 'https://yi-chong-guide.pages.dev';
 const pageUrl = new URL(Astro.url.pathname, siteUrl).toString();
 const fullImageUrl = new URL(image, siteUrl).toString();
 const pageTitle = title === '异宠指南' ? title : `${title} | 异宠指南`;
@@ -127,14 +127,6 @@ const baiduHmId = import.meta.env.PUBLIC_BAIDU_HM_ID || '1bcb13a8a510610b9e76f28
     </script>
   </head>
   <body>
-    <!-- Page Loading Animation -->
-    <div id="page-loader" class="page-loader">
-      <div class="loader-content">
-        <span class="loader-icon">🦎</span>
-        <span class="loader-text">加载中...</span>
-      </div>
-    </div>
-    
     <Header />
     <main id="main-content">
       <slot />
@@ -149,18 +141,6 @@ const baiduHmId = import.meta.env.PUBLIC_BAIDU_HM_ID || '1bcb13a8a510610b9e76f28
     </button>
     
     <script>
-      // Page loader
-      const pageLoader = document.getElementById('page-loader');
-      
-      window.addEventListener('load', () => {
-        setTimeout(() => {
-          pageLoader?.classList.add('hidden');
-          setTimeout(() => {
-            pageLoader?.remove();
-          }, 500);
-        }, 300);
-      });
-      
       // Back to top button
       const backToTop = document.getElementById('back-to-top');
       
@@ -176,17 +156,21 @@ const baiduHmId = import.meta.env.PUBLIC_BAIDU_HM_ID || '1bcb13a8a510610b9e76f28
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
       
-      // Register Service Worker
+      // 清理旧 Service Worker，避免旧缓存导致页面跳转失败
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then((registration) => {
-              console.log('SW注册成功:', registration.scope);
+          navigator.serviceWorker.getRegistrations()
+            .then((registrations) => {
+              registrations.forEach((registration) => registration.unregister());
             })
-            .catch((error) => {
-              console.log('SW注册失败:', error);
-            });
+            .catch(() => {});
         });
+      }
+
+      if ('caches' in window) {
+        caches.keys()
+          .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+          .catch(() => {});
       }
 
       // Smooth scroll for anchor links
@@ -205,51 +189,7 @@ const baiduHmId = import.meta.env.PUBLIC_BAIDU_HM_ID || '1bcb13a8a510610b9e76f28
     </script>
     
     <style>
-      /* Page Loader */
-      .page-loader {
-        position: fixed;
-        inset: 0;
-        background: var(--color-bg);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        transition: opacity 0.5s ease, visibility 0.5s ease;
-      }
-      
-      .page-loader.hidden {
-        opacity: 0;
-        visibility: hidden;
-      }
-      
-      .loader-content {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: var(--space-3);
-      }
-      
-      .loader-icon {
-        font-size: 4rem;
-        animation: loaderBounce 1s ease infinite;
-      }
-      
-      .loader-text {
-        font-size: 1rem;
-        color: var(--color-text-secondary);
-        animation: loaderPulse 1.5s ease infinite;
-      }
-      
-      @keyframes loaderBounce {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-10px); }
-      }
-      
-      @keyframes loaderPulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
-      }
-      
+      /* Back to top button */
       .back-to-top {
         position: fixed;
         bottom: 2rem;

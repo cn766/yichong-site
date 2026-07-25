@@ -2,7 +2,7 @@
 title: "鬃狮蜥食谱大全：从幼体到成体的科学喂食方案"
 description: "详解鬃狮蜥各年龄段的荤素比例、推荐食材清单、禁食名单、钙粉维生素补充方案。覆盖幼体/亚成体/成体全生命周期。"
 pubDate: 2026-05-27
-heroImage: "/images/zongshilv-shipu.jpg"
+heroImage: "/images/zongshilv-shipu.webp"
 category: "饲养管理"
 tags: ["鬃狮蜥", "食谱", "喂食", "营养", "钙粉", "荤素搭配"]
 ---

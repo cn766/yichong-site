@@ -3,7 +3,7 @@ title: "巴西龟常见问题：能长多大？需要多深的水？会咬人吗
 description: "巴西龟最常被问到的15个问题，涵盖体型、水缸大小、喂食、冬眠、变异品种、疾病等。"
 pubDate: 2025-05-28
 updatedDate: 2025-05-28
-heroImage: "/images/baxigui-faq.jpg"
+heroImage: "/images/baxigui-faq.webp"
 category: "龟类"
 tags: ["巴西龟", "巴西龟FAQ", "宠物龟", "水龟", "异宠"]
 author: "异宠指南编辑部"

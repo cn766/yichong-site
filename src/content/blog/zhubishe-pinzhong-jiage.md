@@ -2,7 +2,7 @@
 title: "猪鼻蛇品种图鉴与价格指南：从原色到变异全解析"
 description: "详解猪鼻蛇8大热门品种：原色、白化、康达、缺黄等，含价格区间（400-10000+元）、基因遗传方式、选购建议和市场行情。"
 pubDate: 2026-05-30
-heroImage: "/images/zhubishe-pinzhong.jpg"
+heroImage: "/images/zhubishe-pinzhong.webp"
 category: "品种鉴赏"
 tags: ["猪鼻蛇", "品种", "价格", "白化", "康达", "选购指南"]
 ---

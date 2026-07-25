@@ -2,7 +2,7 @@
 title: "鬃狮蜥UVB光照完全指南：选灯、距离、更换周期一篇讲透"
 description: "鬃狮蜥UVB灯的选购、安装距离、照射时间、品牌横评、常见误区。UVB不对=缺钙=代谢性骨病，新手必读。"
 pubDate: 2026-05-27
-heroImage: "/images/zongshilv-uvb.jpg"
+heroImage: "/images/zongshilv-uvb.webp"
 category: "技术教程"
 tags: ["鬃狮蜥", "UVB", "光照", "补钙", "代谢性骨病", "设备"]
 ---

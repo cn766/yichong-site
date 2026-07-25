@@ -6,7 +6,7 @@ export async function GET() {
   const rssString = await getRssString({
     title: '异宠指南',
     description: '中国第一个异宠新手系统化饲养指南——守宫、玉米蛇、鬃狮蜥、角蛙全面饲养知识',
-    site: 'https://yichongzhinan.com',
+    site: 'https://yi-chong-guide.pages.dev',
     items: posts.map(post => ({
       title: post.data.title,
       description: post.data.description,

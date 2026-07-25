@@ -3,7 +3,7 @@ title: "睫角守宫品种图鉴：从显纹到丛毛，热门品系全解析"
 description: "睫角守宫品种图鉴，详解图案基因、颜色基因、结构基因三大类品系，含价格区间和选购建议。"
 pubDate: 2025-05-28
 updatedDate: 2025-05-28
-heroImage: "/images/jiejiao-pinzhong.jpg"
+heroImage: "/images/jiejiao-pinzhong.webp"
 category: "守宫"
 tags: ["睫角守宫", "睫角守宫品种", "守宫品系", "爬宠", "宠物蜥蜴"]
 author: "异宠指南编辑部"

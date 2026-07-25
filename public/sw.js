@@ -1,4 +1,4 @@
-// ???? Service Worker:??????????? ERR_FAILED
+// 清理旧版 Service Worker：旧缓存可能导致页面跳转 ERR_FAILED
 self.addEventListener('install', () => {
   self.skipWaiting();
 });

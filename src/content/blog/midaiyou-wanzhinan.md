@@ -3,7 +3,7 @@ title: "蜜袋鼯完全指南：会飞的小可爱饲养百科（2025版）"
 description: "蜜袋鼯饲养完全指南，覆盖品种选择、饲养环境搭建、饮食方案、 bonding训练、健康管理与疾病防治等全部内容。基于真实饲养经验，5000+字深度长文。"
 pubDate: 2025-05-28
 updatedDate: 2025-05-28
-heroImage: "/images/midaiyou-hero.jpg"
+heroImage: "/images/midaiyou-hero.webp"
 category: "哺乳类"
 tags: ["蜜袋鼯", "宠物蜜袋鼯", "蜜袋鼯饲养", "异宠哺乳类", "新手入门"]
 author: "异宠指南编辑部"

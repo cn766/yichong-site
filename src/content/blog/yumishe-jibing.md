@@ -2,7 +2,7 @@
 title: "玉米蛇常见疾病识别与家庭处理指南"
 description: "覆盖玉米蛇8大常见疾病：呼吸道感染、口腔炎、鳞片腐烂、寄生虫、便秘、脱皮不全、呕吐、拒食的识别方法与处理方案。"
 pubDate: 2026-05-27
-heroImage: "/images/yumishe-jibing.jpg"
+heroImage: "/images/yumishe-jibing.webp"
 category: "疾病处理"
 tags: ["玉米蛇", "疾病", "呼吸道感染", "口腔炎", "鳞片腐烂", "爬宠医疗"]
 ---

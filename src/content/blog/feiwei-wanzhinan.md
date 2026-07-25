@@ -3,7 +3,7 @@ title: "肥尾守宫完全指南：豹纹守宫的优雅替代（2025版）"
 description: "肥尾守宫饲养完全指南，覆盖品种选择、饲养环境、温控方案、喂食与补钙、健康管理、与豹纹守宫的区别等。肥尾守宫是守宫三大热门之一，性格更温顺、更安静。"
 pubDate: 2025-05-28
 updatedDate: 2025-05-28
-heroImage: "/images/feiwei-hero.jpg"
+heroImage: "/images/feiwei-hero.webp"
 category: "守宫"
 tags: ["肥尾守宫", "守宫", "爬宠", "宠物蜥蜴", "新手入门"]
 author: "异宠指南编辑部"

@@ -3,7 +3,7 @@ title: "蓝舌石龙子 vs 鬃狮蜥：最受欢迎的宠物蜥蜴怎么选？"
 description: "蓝舌石龙子和鬃狮蜥都是最受欢迎的宠物蜥蜴，但饲养方式完全不同。基于真实饲养经验的8维度对比。"
 pubDate: 2025-05-28
 updatedDate: 2025-05-28
-heroImage: "/images/lanshe-vs-zongshixi.jpg"
+heroImage: "/images/lanshe-vs-zongshixi.webp"
 category: "蜥蜴"
 tags: ["蓝舌石龙子", "鬃狮蜥", "宠物蜥蜴", "爬宠对比", "蜥蜴推荐"]
 author: "异宠指南编辑部"

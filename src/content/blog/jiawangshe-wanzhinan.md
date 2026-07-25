@@ -3,7 +3,7 @@ title: "加州王蛇完全指南：蛇毒免疫的王者（2025版）"
 description: "加州王蛇饲养完全指南，覆盖品种选择、饲养环境、喂食方案、健康管理与疾病防治。加州王蛇以蛇毒免疫著称，是最独特的新手宠物蛇。"
 pubDate: 2025-05-28
 updatedDate: 2025-05-28
-heroImage: "/images/jiawangshe-hero.jpg"
+heroImage: "/images/jiawangshe-hero.webp"
 category: "蛇类"
 tags: ["加州王蛇", "王蛇", "宠物蛇", "爬宠", "新手入门"]
 author: "异宠指南编辑部"

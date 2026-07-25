@@ -2,7 +2,7 @@
 title: "角蛙饲养环境搭建指南：从垫材到温控一步到位"
 description: "详解角蛙饲养环境：垫材选择、温控方案、湿度管理、水盆设置、遮蔽物布置。正确的环境=健康的角蛙。"
 pubDate: 2026-05-27
-heroImage: "/images/jiaowa-huanjing.jpg"
+heroImage: "/images/jiaowa-huanjing.webp"
 category: "技术教程"
 tags: ["角蛙", "饲养环境", "垫材", "温控", "湿度", "设备"]
 ---

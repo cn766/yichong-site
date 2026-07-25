@@ -2,7 +2,7 @@
 title: "玉米蛇繁殖入门指南：从配对到孵化全流程"
 description: "详解玉米蛇繁殖完整流程：冬化操作、配种时机、产卵孵化、幼蛇开口。适合想体验繁殖乐趣的中级饲养者。"
 pubDate: 2026-05-27
-heroImage: "/images/yumishe-fanzhi.jpg"
+heroImage: "/images/yumishe-fanzhi.webp"
 category: "繁殖"
 tags: ["玉米蛇", "繁殖", "孵化", "冬化", "爬宠繁殖"]
 ---

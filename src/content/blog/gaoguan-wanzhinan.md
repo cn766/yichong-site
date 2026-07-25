@@ -3,7 +3,7 @@ title: "高冠变色龙完全指南：入门级变色龙饲养百科（2025版�
 description: "高冠变色龙饲养完全指南，覆盖品种选择、雨林缸搭建、UVB光照、喷淋系统、喂食方案、健康管理等。变色龙是最具视觉冲击力的宠物蜥蜴。"
 pubDate: 2025-05-28
 updatedDate: 2025-05-28
-heroImage: "/images/gaoguan-hero.jpg"
+heroImage: "/images/gaoguan-hero.webp"
 category: "蜥蜴"
 tags: ["高冠变色龙", "变色龙", "宠物蜥蜴", "爬宠", "雨林缸"]
 author: "异宠指南编辑部"

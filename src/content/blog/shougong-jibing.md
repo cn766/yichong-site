@@ -4,7 +4,7 @@ description: "守宫是相对好养的异宠，但疾病仍然会发生。本文
 pubDate: 2026-05-27
 category: "疾病处理"
 tags: ["守宫疾病", "脱皮不全", "肠胃炎", "代谢性骨病", "异宠医疗"]
-heroImage: "/images/jibing-hero.jpg"
+heroImage: "/images/jibing-hero.webp"
 schemaType: FAQ
 faqItems:
   - question: 守宫脱皮不全怎么办？

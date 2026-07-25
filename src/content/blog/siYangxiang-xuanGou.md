@@ -4,7 +4,7 @@ description: "异宠饲养箱是决定宠物生存质量的核心设备。本文
 pubDate: 2026-05-27
 category: "装备选购"
 tags: ["饲养箱", "玻璃缸", "PVC箱", "爬宠装备", "选购指南"]
-heroImage: "/images/yangzhi-xiang.jpg"
+heroImage: "/images/yangzhi-xiang.webp"
 schemaType: HowTo
 howToSteps:
   - name: 确定饲养箱尺寸

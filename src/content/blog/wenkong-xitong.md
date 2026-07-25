@@ -4,7 +4,7 @@ description: "爬宠温控系统是饲养成功的关键。本文详解加热垫
 pubDate: 2026-05-27
 category: "技术教程"
 tags: ["温控系统", "加热垫", "温控器", "爬宠装备", "技术教程"]
-heroImage: "/images/wenkong-xitong.jpg"
+heroImage: "/images/wenkong-xitong.webp"
 schemaType: HowTo
 howToSteps:
   - name: 选择合适的热源设备

@@ -2,7 +2,7 @@
 title: "角蛙品种图鉴：南美角蛙、霸王角蛙、蝴蝶角蛙全解析"
 description: "详解角蛙6大热门品种：南美/钟角蛙/霸王角蛙/蝴蝶角蛙/绿角蛙/变异色型，含外观特征、价格区间和选购避坑指南。"
 pubDate: 2026-05-27
-heroImage: "/images/jiaowa-pinzhong.jpg"
+heroImage: "/images/jiaowa-pinzhong.webp"
 category: "品种鉴赏"
 tags: ["角蛙", "南美角蛙", "霸王角蛙", "蝴蝶角蛙", "品种", "选购指南"]
 ---

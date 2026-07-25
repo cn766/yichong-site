@@ -3,7 +3,7 @@ title: "豹纹守宫 vs 睫角守宫：两大守宫巨头怎么选？"
 description: "豹纹守宫和睫角守宫是爬宠界两大人气王，但饲养方式完全不同——一个吃虫地栖，一个吃果泥树栖。基于真实饲养经验的全方位对比。"
 pubDate: 2025-05-28
 updatedDate: 2025-05-28
-heroImage: "/images/baowen-vs-jiejiao.jpg"
+heroImage: "/images/baowen-vs-jiejiao.webp"
 category: "守宫"
 tags: ["豹纹守宫", "睫角守宫", "守宫对比", "爬宠", "宠物蜥蜴"]
 author: "异宠指南编辑部"

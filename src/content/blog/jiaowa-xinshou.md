@@ -4,7 +4,7 @@ description: "角蛙（Horned Frog/Ceratophrys）是最适合新手的宠物蛙�
 pubDate: 2026-05-27
 category: "新手指南"
 tags: ["角蛙", "宠物蛙", "Ceratophrys", "新手指南"]
-heroImage: "/images/jiaowa-hero.jpg"
+heroImage: "/images/jiaowa-hero.webp"
 schemaType: HowTo
 howToSteps:
   - name: 认识角蛙的特性

@@ -3,7 +3,7 @@ title: "豹纹守宫常见问题：好养吗？吃什么？尾巴为什么变细
 description: "豹纹守宫最常被问到的15个问题，涵盖饲养难度、喂食、蜕皮、疾病、品系选择等。基于真实饲养经验。"
 pubDate: 2025-05-28
 updatedDate: 2025-05-28
-heroImage: "/images/baowen-faq.jpg"
+heroImage: "/images/baowen-faq.webp"
 category: "守宫"
 tags: ["豹纹守宫", "守宫FAQ", "豹纹守宫饲养", "爬宠", "新手入门"]
 author: "异宠指南编辑部"

@@ -3,7 +3,7 @@ title: "蓝舌石龙子常见问题：好养吗？吃什么？多少钱？"
 description: "蓝舌石龙子饲养最常被问到的15个问题，涵盖饲养难度、饮食、亚种选择、价格等。"
 pubDate: 2025-05-28
 updatedDate: 2025-05-28
-heroImage: "/images/lanshe-faq.jpg"
+heroImage: "/images/lanshe-faq.webp"
 category: "蜥蜴"
 tags: ["蓝舌石龙子", "蓝舌蜥FAQ", "蓝舌石龙子价格", "爬宠", "蜥蜴"]
 author: "异宠指南编辑部"
