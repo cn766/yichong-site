@@ -1,0 +1,614 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="搜索 | 异宠指南" description="搜索异宠指南的全部内容——守宫、玉米蛇、鬃狮蜥、角蛙饲养知识。">
+  <!-- Hero -->
+  <section class="search-hero">
+    <div class="hero-bg">
+      <div class="hero-pattern"></div>
+    </div>
+    <div class="container">
+      <div class="hero-content">
+        <span class="hero-badge">🔍 搜索</span>
+        <h1>搜索文章</h1>
+        <p class="hero-desc">在全站内容中搜索你感兴趣的异宠饲养知识。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Search Section -->
+  <section class="search-content">
+    <div class="container">
+      <!-- Search Input -->
+      <div class="search-box-wrapper">
+        <div class="search-input-container">
+          <svg class="search-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.3-4.3"></path>
+          </svg>
+          <input
+            type="text"
+            id="pagefind-search-input"
+            class="search-input"
+            placeholder="输入关键词搜索..."
+            autocomplete="off"
+          />
+          <button class="search-clear-btn" id="search-clear-btn" aria-label="清空搜索" style="display:none;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 6 6 18"></path>
+              <path d="m6 6 12 12"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Status Bar -->
+      <div class="search-status" id="search-status" style="display:none;">
+        <span id="search-status-text"></span>
+      </div>
+
+      <!-- Loading State -->
+      <div class="search-loading" id="search-loading" style="display:none;">
+        <div class="loading-spinner"></div>
+        <p>正在搜索...</p>
+      </div>
+
+      <!-- Results List -->
+      <div class="search-results" id="search-results">
+        <!-- Initial state: tips -->
+        <div class="search-empty" id="search-empty">
+          <div class="search-empty-icon">🔍</div>
+          <p>输入关键词开始搜索</p>
+          <div class="search-suggestions">
+            <span class="suggestion-label">热门搜索：</span>
+            <button class="suggestion-tag" data-query="守宫">守宫</button>
+            <button class="suggestion-tag" data-query="玉米蛇">玉米蛇</button>
+            <button class="suggestion-tag" data-query="鬃狮蜥">鬃狮蜥</button>
+            <button class="suggestion-tag" data-query="角蛙">角蛙</button>
+            <button class="suggestion-tag" data-query="新手入门">新手入门</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Load Pagefind -->
+  <script async src="/_pagefind/pagefind-ui.js"></script>
+</Layout>
+
+<script>
+  const searchInput = document.getElementById('pagefind-search-input') as HTMLInputElement;
+  const searchResults = document.getElementById('search-results');
+  const searchEmpty = document.getElementById('search-empty');
+  const searchLoading = document.getElementById('search-loading');
+  const searchStatus = document.getElementById('search-status');
+  const searchStatusText = document.getElementById('search-status-text');
+  const searchClearBtn = document.getElementById('search-clear-btn');
+
+  let pagefindInstance: any = null;
+  let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+  // Highlight matching text
+  function highlightText(text: string, query: string): string {
+    if (!query) return text;
+    const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escaped})`, 'gi');
+    return text.replace(regex, '<mark>$1</mark>');
+  }
+
+  // Escape HTML to prevent XSS
+  function escapeHtml(text: string): string {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // Truncate text to a given length
+  function truncate(text: string, maxLen: number): string {
+    if (text.length <= maxLen) return text;
+    return text.slice(0, maxLen).trim() + '...';
+  }
+
+  // Format URL for static site
+  function formatUrl(rawUrl: string): string {
+    // Pagefind returns paths like /blog/my-post/index.html
+    // We need to convert to /blog/my-post.html for our build format
+    return rawUrl;
+  }
+
+  // Initialize Pagefind
+  async function initPagefind() {
+    try {
+      // @ts-ignore - pagefind is loaded via script tag
+      pagefindInstance = await pagefind.init({
+        // Use the locally generated index
+      });
+    } catch (err) {
+      console.error('Pagefind initialization failed:', err);
+      searchResults!.innerHTML = `
+        <div class="search-error">
+          <div class="search-empty-icon">⚠️</div>
+          <p>搜索功能加载失败，请确保已运行构建脚本生成索引。</p>
+          <p class="search-hint">请运行 scripts/run-build.ps1 后重试。</p>
+        </div>
+      `;
+    }
+  }
+
+  // Perform search
+  async function performSearch(query: string) {
+    if (!pagefindInstance || !query.trim()) {
+      if (searchEmpty) searchEmpty.style.display = 'block';
+      if (searchStatus) searchStatus.style.display = 'none';
+      if (searchClearBtn) searchClearBtn.style.display = 'none';
+      return;
+    }
+
+    // Show loading
+    if (searchEmpty) searchEmpty.style.display = 'none';
+    if (searchLoading) searchLoading.style.display = 'flex';
+    if (searchClearBtn) searchClearBtn.style.display = 'flex';
+
+    try {
+      const results = await pagefindInstance.search(query);
+      
+      // Hide loading
+      if (searchLoading) searchLoading.style.display = 'none';
+
+      // Show status
+      if (searchStatus) {
+        searchStatus.style.display = 'flex';
+        if (searchStatusText) {
+          searchStatusText.textContent = `找到 ${results.results.length} 个结果`;
+        }
+      }
+
+      if (results.results.length === 0) {
+        searchResults!.innerHTML = `
+          <div class="search-no-results">
+            <div class="search-empty-icon">😕</div>
+            <p>没有找到与 "${escapeHtml(query)}" 相关的内容</p>
+            <p class="search-hint">试试其他关键词？</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Load result data (limit to 20 results for performance)
+      const limitResults = results.results.slice(0, 20);
+      const loadedResults = await Promise.all(
+        limitResults.map((r: any) => r.data())
+      );
+
+      // Render results
+      const html = loadedResults.map((item: any, index: number) => {
+        const title = escapeHtml(item.meta?.title || '无标题');
+        const description = escapeHtml(
+          truncate(item.content || item.meta?.description || '', 200)
+        );
+        const url = formatUrl(item.url);
+        const category = escapeHtml(item.meta?.category || item.filters?.category?.[0] || '');
+        const tags = item.meta?.tags || [];
+        const tagsStr = Array.isArray(tags) ? tags.slice(0, 3).map((t: string) => 
+          `<span class="result-tag">${escapeHtml(t)}</span>`
+        ).join('') : '';
+
+        return `
+          <a href="${url}" class="search-result-item" style="animation-delay: ${index * 50}ms">
+            ${category ? `<div class="result-category">${category}</div>` : ''}
+            <div class="result-title">${highlightText(title, query)}</div>
+            <div class="result-description">${highlightText(description, query)}</div>
+            ${tagsStr ? `<div class="result-tags">${tagsStr}</div>` : ''}
+          </a>
+        `;
+      }).join('');
+
+      searchResults!.innerHTML = html;
+    } catch (err) {
+      console.error('Search failed:', err);
+      if (searchLoading) searchLoading.style.display = 'none';
+      searchResults!.innerHTML = `
+        <div class="search-error">
+          <div class="search-empty-icon">⚠️</div>
+          <p>搜索过程中出错，请稍后重试。</p>
+        </div>
+      `;
+    }
+  }
+
+  // Initialize Pagefind after page load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPagefind);
+  } else {
+    initPagefind();
+  }
+
+  // Input handler with debounce
+  searchInput?.addEventListener('input', (e) => {
+    const query = (e.target as HTMLInputElement).value;
+    
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+    }
+
+    if (!query.trim()) {
+      if (searchResults) searchResults.innerHTML = '';
+      if (searchEmpty) searchEmpty.style.display = 'block';
+      if (searchStatus) searchStatus.style.display = 'none';
+      if (searchClearBtn) searchClearBtn.style.display = 'none';
+      return;
+    }
+
+    debounceTimer = setTimeout(() => {
+      performSearch(query);
+    }, 300);
+  });
+
+  // Clear button
+  searchClearBtn?.addEventListener('click', () => {
+    if (searchInput) searchInput.value = '';
+    if (searchResults) {
+      searchResults.innerHTML = `
+        <div class="search-empty" id="search-empty">
+          <div class="search-empty-icon">🔍</div>
+          <p>输入关键词开始搜索</p>
+          <div class="search-suggestions">
+            <span class="suggestion-label">热门搜索：</span>
+            <button class="suggestion-tag" data-query="守宫">守宫</button>
+            <button class="suggestion-tag" data-query="玉米蛇">玉米蛇</button>
+            <button class="suggestion-tag" data-query="鬃狮蜥">鬃狮蜥</button>
+            <button class="suggestion-tag" data-query="角蛙">角蛙</button>
+            <button class="suggestion-tag" data-query="新手入门">新手入门</button>
+          </div>
+        </div>
+      `;
+    }
+    if (searchStatus) searchStatus.style.display = 'none';
+    if (searchClearBtn) searchClearBtn.style.display = 'none';
+    searchInput?.focus();
+  });
+
+  // Suggestion tags
+  document.querySelectorAll('.suggestion-tag').forEach(tag => {
+    tag.addEventListener('click', () => {
+      const query = tag.getAttribute('data-query');
+      if (searchInput && query) {
+        searchInput.value = query;
+        performSearch(query);
+      }
+    });
+  });
+
+  // Auto-focus search input on page load
+  setTimeout(() => {
+    searchInput?.focus();
+  }, 500);
+</script>
+
+<style>
+  /* Hero Section - consistent with blog/index.astro */
+  .search-hero {
+    position: relative;
+    padding: var(--space-16) 0;
+    background: linear-gradient(135deg, var(--forest-50) 0%, var(--earth-50) 100%);
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .hero-pattern {
+    position: absolute;
+    inset: 0;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  .hero-content {
+    position: relative;
+    text-align: center;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    padding: var(--space-2) var(--space-4);
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid var(--forest-200);
+    border-radius: var(--radius-full);
+    font-size: 0.9rem;
+    color: var(--forest-700);
+    font-weight: 500;
+    margin-bottom: var(--space-4);
+  }
+
+  .search-hero h1 {
+    font-size: clamp(2rem, 5vw, 2.5rem);
+    margin-bottom: var(--space-4);
+    color: var(--forest-900);
+  }
+
+  .hero-desc {
+    font-size: 1.1rem;
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* Search Content */
+  .search-content {
+    padding: var(--space-10) 0 var(--space-16);
+  }
+
+  /* Search Box */
+  .search-box-wrapper {
+    max-width: 640px;
+    margin: 0 auto var(--space-8);
+  }
+
+  .search-input-container {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-fast);
+  }
+
+  .search-input-container:focus-within {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 4px rgba(74, 138, 74, 0.1), var(--shadow-lg);
+  }
+
+  .search-input-container .search-icon {
+    color: var(--color-text-muted);
+    flex-shrink: 0;
+  }
+
+  .search-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 0;
+    font-size: 1.15rem;
+    color: var(--color-text);
+    min-width: 0;
+  }
+
+  .search-input:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  .search-clear-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: var(--stone-200);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+  }
+
+  .search-clear-btn:hover {
+    background: var(--stone-300);
+    color: var(--color-text);
+  }
+
+  /* Status Bar */
+  .search-status {
+    max-width: 640px;
+    margin: 0 auto var(--space-6);
+    padding: var(--space-2) var(--space-4);
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    justify-content: center;
+  }
+
+  /* Loading */
+  .search-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-16) var(--space-5);
+  }
+
+  .loading-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid var(--stone-200);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .search-loading p {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+
+  /* Empty / No Results State */
+  .search-empty,
+  .search-no-results,
+  .search-error {
+    text-align: center;
+    padding: var(--space-16) var(--space-5);
+  }
+
+  .search-empty-icon {
+    font-size: 4rem;
+    margin-bottom: var(--space-4);
+    opacity: 0.6;
+  }
+
+  .search-empty p,
+  .search-no-results p,
+  .search-error p {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-4);
+  }
+
+  .search-hint {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+  }
+
+  .search-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+  }
+
+  .suggestion-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+
+  .suggestion-tag {
+    padding: var(--space-1) var(--space-3);
+    background: var(--forest-50);
+    border: 1px solid var(--forest-200);
+    border-radius: var(--radius-full);
+    font-size: 0.85rem;
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .suggestion-tag:hover {
+    background: var(--forest-100);
+    border-color: var(--color-primary);
+  }
+
+  /* Search Results */
+  .search-results {
+    max-width: 760px;
+    margin: 0 auto;
+    min-height: 200px;
+  }
+
+  .search-result-item {
+    display: block;
+    padding: var(--space-5) var(--space-6);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-3);
+    transition: all var(--transition-base);
+    text-decoration: none;
+    animation: fadeInUp 0.4s ease-out backwards;
+  }
+
+  .search-result-item:hover {
+    border-color: var(--forest-300);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+  }
+
+  .result-category {
+    font-size: 0.75rem;
+    color: var(--color-primary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-2);
+  }
+
+  .result-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--space-2);
+    line-height: 1.4;
+  }
+
+  .result-title mark {
+    background: var(--color-accent-light);
+    color: var(--stone-900);
+    padding: 0.1rem 0.2rem;
+    border-radius: 3px;
+  }
+
+  .result-description {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin-bottom: var(--space-3);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .result-description mark {
+    background: var(--color-accent-light);
+    color: var(--stone-900);
+    padding: 0.1rem 0.2rem;
+    border-radius: 3px;
+  }
+
+  .result-tags {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  .result-tag {
+    font-size: 0.75rem;
+    padding: 0.2rem var(--space-3);
+    background: var(--stone-100);
+    border-radius: var(--radius-full);
+    color: var(--color-text-muted);
+    transition: color var(--transition-fast);
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .search-hero {
+      padding: var(--space-10) 0;
+    }
+
+    .search-input-container {
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-lg);
+    }
+
+    .search-input {
+      font-size: 1rem;
+    }
+
+    .search-result-item {
+      padding: var(--space-4);
+      border-radius: var(--radius-md);
+    }
+
+    .search-suggestions {
+      gap: var(--space-2);
+    }
+
+    .suggestion-tag {
+      padding: var(--space-1) var(--space-2);
+      font-size: 0.8rem;
+    }
+  }
+</style>
